@@ -18,7 +18,7 @@ GET /getCatPhotos?id=1
 请求示例2：
 GET /getCatPhotos
 返回示例2：
-{"info":"success","url":[{"id":1,"url":["https://xxx.com/1.jpg","https://xxx.com/2.jpg"]},{"id":1,"url":["https://xxx.com/1.jpg","https://xxx.com/2.jpg"]}]}
+{"info":"success","url":[{"id":1,"url":["https://xxx.com/1.jpg","https://xxx.com/2.jpg"]},{"id":2,"url":["https://xxx.com/3.jpg","https://xxx.com/4.jpg"]}]}
 
 检查更新
 URL：/api/checkUpdate
@@ -29,7 +29,7 @@ GET /api/checkUpdate
 返回格式：json
 返回示例：
 {"info":"success","newestVersion":2,"apkUrl":"https://xxx.com/xxx.apk","iosUrl":"https://testflight.appl.com/xxx"}
-haveUpdate为0则无更新，为1则有更新
+newestVersion是最新版本的版本号
 
 获取特定猫咪位置信息（当天）
 URL：/api/getPositions
@@ -42,12 +42,13 @@ GET /api/getPosition?id=1
 {"info":"success","positions":[{"type":"checkpoint","time":"8:45","duration":8},{"type":"line","time":"15:25","duration":45}]}
 type为时间点类型：checkpoint/line，duration为持续时长（默认返回20）
 
-获取最新闲聊
+获取闲聊
 URL：/api/getChats
 方法：get
-参数：null
+参数：可选参数mid：客户端当前最新的闲聊的id（若无参数，则返回最新的闲聊，若有参数，则返回比闲聊id为mid更旧的10条闲聊）
 请求示例：
 GET /api/getChats
 返回格式：json
 返回示例：
-{"info":"success","data":[{"uid":"1231231","uname":"lollipop","time":"2020.10.10","message":"这只猫好可爱"},{"uid":"123213","uname":"lollipopkit","time":"2020.10.11","message":"这猫好可爱!!"}]}
+{"info":"success","data":[{"mid":1",""uid":"1231231","uname":"lollipop","time":"2020.10.10","message":"这只猫好可爱"},{"mid":1","uid":"123213","uname":"lollipopkit","time":"2020.10.11","message":"这猫好可爱!!"}]}
+默认每次返回10条，不足十条按实际条数返回
