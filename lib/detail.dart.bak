@@ -1,0 +1,139 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+
+import 'model/cat.dart';
+
+class MyDetailPage extends StatefulWidget {
+  final Cat cat;
+  final int catIndex;
+
+  MyDetailPage({Key key, this.cat, this.catIndex}) : super(key: key);
+
+  @override
+  _MyDetailPageState createState() => _MyDetailPageState(cat, catIndex);
+}
+
+class _MyDetailPageState extends State<MyDetailPage> {
+  Cat cat;
+  int catIndex;
+  Map<String, dynamic> photoAmount;
+
+  _MyDetailPageState(Cat cat, int catIndex) {
+    this.cat = cat;
+    this.catIndex = catIndex;
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    getData();
+  }
+
+  void getData() async{
+    try {
+      Response response = await Dio().get('https://cat.lolli.tech/data/photo_amount.json');
+      if (response.statusCode == 200) {
+        photoAmount = jsonDecode(response.toString());
+      } else {
+        print('Http status ${response.statusCode}');
+      }
+    } catch (exception) {
+      print(exception);
+    }
+
+    if (!mounted) return;
+    setState(() {
+      print('Photo Amount Data: $photoAmount');
+    });
+  }
+
+
+  Widget _buildContent(BuildContext context){
+      return SliverFixedExtentList(
+        itemExtent: MediaQuery.of(context).size.height * 0.7,
+        delegate: SliverChildBuilderDelegate((context, index) =>
+            Padding(
+                padding: EdgeInsets.fromLTRB(30, 20, 30, 10),
+                child:
+                photoAmount != null ?
+                photoAmount[cat.name] == index + 1
+                    ? Center(child: Text('没有更多图片\n     (´･ω･`)'))
+                    : Card(
+                  color: Colors.transparent,
+                  elevation: 20.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  semanticContainer: false,
+                  child: Stack(
+                    children: <Widget>[
+                      SizedBox.expand(
+                          child: CachedNetworkImage(
+                            imageUrl: 'https://cat.lolli.tech/img/${catIndex + 1}/${index + 2}.JPG',
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          )
+                      ),
+                      Positioned(
+                          bottom: 0,
+                          child: BlurryContainer(
+                            height: 47,
+                            width: MediaQuery.of(context).size.width - 60,
+                            borderRadius: BorderRadius.zero,
+                            child: Text(
+                              '拍摄于$index',
+                              textScaleFactor: 1.0,
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 12),
+                            ),
+                          )
+                      ),
+                    ],
+                  ),
+                ) : Center(child: CircularProgressIndicator())
+            ),
+          childCount: photoAmount != null ? photoAmount[cat.name] : 1
+        )
+      );
+    }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            flexibleSpace: FlexibleSpaceBar(
+              background: Hero(
+                  tag: cat,
+                  transitionOnUserGestures: true,
+                  child: CachedNetworkImage(
+                    imageUrl: 'https://cat.lolli.tech/img/${catIndex + 1}/1.JPG',
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  )
+              ),
+            ),
+            expandedHeight: 230.0,
+            backgroundColor: Colors.transparent,
+            title: Text(cat.name),
+            pinned: true,
+          ),
+          _buildContent(context)
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {  },
+        backgroundColor: cat.sex == '男' ? Colors.lightBlueAccent : Colors.pinkAccent,
+        child: Icon(Icons.alt_route),
+      )
+    );
+  }
+}
