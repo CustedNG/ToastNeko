@@ -49,9 +49,9 @@ android {
     signingConfigs {
         release {
             keyAlias 'key'
-            keyPassword '123123XTy'
+            keyPassword ''
             storeFile file('/Users/mac/Downloads/key.jks')
-            storePassword '123123XTy'
+            storePassword ''
         }
     }
     buildTypes {

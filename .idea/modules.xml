@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cat_gallery.iml" filepath="$PROJECT_DIR$/cat_gallery.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android/cat_gallery_android.iml" filepath="$PROJECT_DIR$/android/cat_gallery_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ToastNeko.iml" filepath="$PROJECT_DIR$/ToastNeko.iml" />
     </modules>
   </component>
 </project>
