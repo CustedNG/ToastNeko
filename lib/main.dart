@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +16,10 @@ import 'widget/round_shape.dart';
 import 'info.dart';
 import 'discuss.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  Hive.init('');
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -49,6 +55,7 @@ class MyApp extends StatelessWidget {
         nextScreen: MyHomePage(title: 'Neko'),
         duration: 1000,
         splashIconSize: 137,
+        function: initData,
         backgroundColor: Color.fromRGBO(243, 233, 198, 1),
         curve: Curves.easeInOutCubic,
         animationDuration: Duration(milliseconds: 777),
@@ -57,6 +64,22 @@ class MyApp extends StatelessWidget {
       )
     );
   }
+}
+
+Future<void> initData() async {
+  Map<String, dynamic> photoUrls;
+  try {
+    Response response = await Dio().get('https://cat.lolli.tech/data/photo_amount.json');
+    if (response.statusCode == 200) {
+      photoUrls = jsonDecode(response.toString());
+    } else {
+      print('Http Status Code ${response.statusCode}');
+    }
+  } catch (exception) {
+    print(exception);
+  }
+
+  print('Photo Url Data: $photoUrls');
 }
 
 class MyHomePage extends StatefulWidget {

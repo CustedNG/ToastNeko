@@ -26,9 +26,12 @@ class _ActivityTimelineState extends State<ActivityTimeline> {
         data: Theme.of(context).copyWith(
           accentColor: Colors.white.withOpacity(0.2),
         ),
-        child: Center(
-          child: _TimelineActivity(steps: _steps),
-        ),
+        child: Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: Center(
+            child: _TimelineActivity(steps: _steps),
+          ),
+        )
       ),
     );
   }

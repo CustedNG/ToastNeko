@@ -4,7 +4,6 @@ import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/photo.dart';
 import 'package:cat_gallery/position.dart';
-import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:dio/dio.dart';
@@ -65,7 +64,7 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
 
   Widget _buildCard(int index){
     String url = 'https://cat.lolli.tech/img/${catIndex + 1}/${index + 1}.JPG';
-    bool isNotLast = index != photoAmount[cat.name];
+    bool isNotLast = index != photoAmount[cat.id];
 
     return GestureDetector(
       onTap: () => isNotLast ? Navigator.push(
@@ -123,7 +122,7 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
           StaggeredGridView.countBuilder(
             physics: BouncingScrollPhysics(),
             crossAxisCount: 4,
-            itemCount: photoAmount[cat.name] + 1,
+            itemCount: photoAmount[cat.id] + 1,
             itemBuilder: (BuildContext context, int index) => Hero(
                 tag: index == 0 ? cat : index.hashCode,
                 transitionOnUserGestures: true,
