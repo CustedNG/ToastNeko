@@ -1,0 +1,49 @@
+名称
+URL：
+方法：
+参数：
+请求示例：
+返回格式：
+返回示例：
+
+获取特定猫咪所有图片
+URL：/api/getCatPhotos
+方法：get
+参数：id：为猫咪id
+返回格式：json
+请求示例：
+GET /getCatPhotos?id=1
+返回示例：
+{"info":"success","url":["https://xxx.com/1.jpg","https://xxx.com/2.jpg"]}
+
+检查更新
+URL：/api/checkUpdate
+方法：get
+参数：null
+请求示例：
+GET /api/checkUpdate
+返回格式：json
+返回示例：
+{"info":"success","newestVersion":2,"apkUrl":"https://xxx.com/xxx.apk","iosUrl":"https://testflight.appl.com/xxx"}
+haveUpdate为0则无更新，为1则有更新
+
+获取特定猫咪位置信息（当天）
+URL：/api/getPositions
+方法：get
+参数：id：猫咪ID
+请求示例：
+GET /api/getPosition?id=1
+返回格式：json
+返回示例：
+{"info":"success","positions":[{"type":"checkpoint","time":"8:45","duration":8},{"type":"line","time":"15:25","duration":45}]}
+type为时间点类型：checkpoint/line，duration为持续时长（默认返回20）
+
+获取最新闲聊
+URL：/api/getChats
+方法：get
+参数：null
+请求示例：
+GET /api/getChats
+返回格式：json
+返回示例：
+{"info":"success","data":[{"uid":"1231231","uname":"lollipop","time":"2020.10.10","message":"这只猫好可爱"},{"uid":"123213","uname":"lollipopkit","time":"2020.10.11","message":"这猫好可爱!!"}]}

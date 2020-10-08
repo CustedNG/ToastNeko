@@ -1,3 +1,4 @@
+import 'package:cat_gallery/timeline.dart';
 import 'package:flutter/material.dart';
 
 class DiscussPage extends StatefulWidget{
@@ -9,6 +10,6 @@ class DiscussPage extends StatefulWidget{
 class _DiscussPageState extends State<DiscussPage>{
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('正在开发...'));
+    return ActivityTimeline();
   }
 }

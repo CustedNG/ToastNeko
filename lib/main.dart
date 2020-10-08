@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -132,7 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildBottom(BuildContext context) {
     return SafeArea(
-        child: Container(
+        child: BlurryContainer(
+          blur: 27,
+          borderRadius: BorderRadius.zero,
           height: 56,
           padding: EdgeInsets.only(left: 8, top: 4, bottom: 4, right: 8),
           //decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
-class _ActivityTimeline extends StatefulWidget {
+class ActivityTimeline extends StatefulWidget {
   @override
   _ActivityTimelineState createState() => _ActivityTimelineState();
 }
 
-class _ActivityTimelineState extends State<_ActivityTimeline> {
+class _ActivityTimelineState extends State<ActivityTimeline> {
   List<Step> _steps;
 
   @override
@@ -17,27 +17,17 @@ class _ActivityTimelineState extends State<_ActivityTimeline> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFF1D1E20),
-      child: Theme(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(''),
+        centerTitle: true,
+      ),
+      body: Theme(
         data: Theme.of(context).copyWith(
           accentColor: Colors.white.withOpacity(0.2),
         ),
-        child: SafeArea(
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Center(
-              child: Column(
-                children: <Widget>[
-                  _Header(),
-                  Expanded(
-                    child: _TimelineActivity(steps: _steps),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            ),
-          ),
+        child: Center(
+          child: _TimelineActivity(steps: _steps),
         ),
       ),
     );
@@ -47,44 +37,37 @@ class _ActivityTimelineState extends State<_ActivityTimeline> {
     return <Step>[
       Step(
         type: Type.checkpoint,
-        icon: Icons.home,
-        message: 'Home',
+        icon: Icons.architecture,
+        message: '东1教',
+        hour: '8.38',
         duration: 2,
         color: const Color(0xFFF2F2F2),
       ),
       Step(
         type: Type.line,
-        hour: '8:38',
-        message: 'Walk',
+        message: '树林休息',
         duration: 9,
         color: const Color(0xFF40C752),
       ),
       Step(
         type: Type.line,
         hour: '8:47',
-        message: 'Transport',
+        message: '门口转悠',
         duration: 12,
         color: const Color(0xFF797979),
-      ),
-      Step(
-        type: Type.line,
-        hour: '8:59',
-        message: 'Run',
-        duration: 3,
-        color: const Color(0xFFDF54C9),
       ),
       Step(
         type: Type.checkpoint,
         icon: Icons.work,
         hour: '9:02',
-        message: 'Work',
+        message: '东区学子亭',
         duration: 2,
         color: const Color(0xFFF2F2F2),
       ),
       Step(
         type: Type.line,
         hour: '12:12',
-        message: 'Walk',
+        message: '睡觉觉',
         duration: 8,
         color: const Color(0xFF40C752),
       ),
@@ -92,44 +75,30 @@ class _ActivityTimelineState extends State<_ActivityTimeline> {
         type: Type.checkpoint,
         icon: Icons.local_drink,
         hour: '12:20',
-        message: 'Coffee shop',
+        message: '在树下！',
         duration: 2,
         color: const Color(0xFFF2F2F2),
       ),
       Step(
         type: Type.line,
         hour: '01:05',
-        message: 'Walk',
+        message: '觅食ing',
         duration: 8,
         color: const Color(0xFF40C752),
       ),
       Step(
-        type: Type.checkpoint,
+        type: Type.line,
         icon: Icons.work,
         hour: '01:13',
-        message: 'Work',
+        message: '消失了～',
         duration: 2,
         color: const Color(0xFFF2F2F2),
-      ),
-      Step(
-        type: Type.line,
-        hour: '05:25',
-        message: 'Walk',
-        duration: 3,
-        color: const Color(0xFF40C752),
-      ),
-      Step(
-        type: Type.line,
-        hour: '05:28',
-        message: 'Cycle',
-        duration: 14,
-        color: const Color(0xFF01CBFE),
       ),
       Step(
         type: Type.checkpoint,
         hour: '05:42',
         icon: Icons.home,
-        message: 'Home',
+        message: '东1教',
         duration: 2,
         color: const Color(0xFFF2F2F2),
       ),
@@ -227,7 +196,7 @@ class _RightChildTimeline extends StatelessWidget {
                   text: step.message,
                 ),
                 TextSpan(
-                  text: '  ${step.duration} min',
+                  text: '  ${step.duration} 分钟',
                 )
               ]),
             ),
@@ -256,25 +225,6 @@ class _LeftChildTimeline extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              'Activity Tracker',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
