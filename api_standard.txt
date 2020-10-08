@@ -6,15 +6,19 @@ URL：
 返回格式：
 返回示例：
 
-获取特定猫咪所有图片
+获取猫咪所有图片
 URL：/api/getCatPhotos
 方法：get
-参数：id：为猫咪id
+参数：可选参数id:猫咪ID（如果无参数，则返回所有猫咪的所有图片，有参数则返回该猫咪的所有图片）
 返回格式：json
-请求示例：
+请求示例1：
 GET /getCatPhotos?id=1
-返回示例：
+返回示例1：
 {"info":"success","url":["https://xxx.com/1.jpg","https://xxx.com/2.jpg"]}
+请求示例2：
+GET /getCatPhotos
+返回示例2：
+{"info":"success","url":[{"id":1,"url":["https://xxx.com/1.jpg","https://xxx.com/2.jpg"]},{"id":1,"url":["https://xxx.com/1.jpg","https://xxx.com/2.jpg"]}]}
 
 检查更新
 URL：/api/checkUpdate
