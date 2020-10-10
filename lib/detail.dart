@@ -2,11 +2,14 @@ import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/photo.dart';
 import 'package:cat_gallery/position.dart';
+import 'package:cat_gallery/timeline.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
+import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import 'discuss.dart';
 import 'model/cat.dart';
 
 class MyDetailPage extends StatefulWidget {
@@ -102,32 +105,53 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
           StatusBarOverlay()
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showDialog(
-            context: context,
-            builder: (ctx){
-              return AlertDialog(
-                shape: RoundShape().build(),
-                title: Text('发现地'),
-                elevation: 20,
-                content: SizedBox(
-                  height: 270 * 0.618,
-                  child: ClipRect(
-                      child: Maps.search(cat.position),
-                  ),
-                ),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('确定'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            }),
-        backgroundColor: cat.sex == '男' ? Colors.lightBlueAccent : Colors.pinkAccent,
-        child: Icon(Icons.alt_route),
+      floatingActionButton: FabCircularMenu(
+        children: [
+          IconButton(
+              icon: Icon(Icons.map),
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (ctx){
+                    return AlertDialog(
+                      shape: RoundShape().build(),
+                      title: Text('发现地'),
+                      elevation: 20,
+                      content: SizedBox(
+                        height: 270 * 0.618,
+                        child: ClipRect(
+                          child: Maps.search(cat.position),
+                        ),
+                      ),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('确定'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  })
+          ),
+          IconButton(
+              icon: Icon(Icons.chat),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChatPage()
+                  )
+              )
+          ),
+          IconButton(
+              icon: Icon(Icons.alt_route),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TimelinePage()
+                  )
+              )
+          )
+        ],
       )
     );
   }

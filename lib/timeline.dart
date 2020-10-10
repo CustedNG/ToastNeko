@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
-class ActivityTimeline extends StatefulWidget {
+class TimelinePage extends StatefulWidget {
   @override
-  _ActivityTimelineState createState() => _ActivityTimelineState();
+  _TimelinePageState createState() => _TimelinePageState();
 }
 
-class _ActivityTimelineState extends State<ActivityTimeline> {
+class _TimelinePageState extends State<TimelinePage> {
   List<Step> _steps;
 
   @override

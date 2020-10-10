@@ -1,15 +1,15 @@
 import 'package:cat_gallery/timeline.dart';
 import 'package:flutter/material.dart';
 
-class DiscussPage extends StatefulWidget{
+class ChatPage extends StatefulWidget{
   @override
-  State<StatefulWidget> createState() => _DiscussPageState();
+  State<StatefulWidget> createState() => _ChatPageState();
 
 }
 
-class _DiscussPageState extends State<DiscussPage>{
+class _ChatPageState extends State<ChatPage>{
   @override
   Widget build(BuildContext context) {
-    return ActivityTimeline();
+    return TimelinePage();
   }
 }
