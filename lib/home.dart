@@ -1,5 +1,7 @@
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +16,7 @@ class HomePage extends StatefulWidget{
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
-  int _index = 4;
+  int _index;
   double _padding;
   FixedExtentScrollController _fixedExtentScrollController = FixedExtentScrollController(initialItem: 4);
   List<Cat> catList = new List<Cat>();
@@ -24,11 +26,21 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   double _scale;
   
   _HomePageState() {
-    catList.add(new Cat('Neko','鸡腿','东区体育馆','未知','橘色狸花'));
-    catList.add(new Cat('Tom','王子','东区学子亭','未知','黑白狸花'));
-    catList.add(new Cat('Miao','汤圆','东区体育馆','未知','全身白色、脑袋顶有一撮黑色'));
-    catList.add(new Cat('Mi','跳跳','东区体育馆','未知','三色玳瑁'));
-    catList.add(new Cat('Mao','肉肉','东区操场','未知','白身，背部黑色狸花'));
+    final catData = CatStore().fetchAll();
+    _index = catData.length - 1;
+    catData.forEach((cat){
+      catList.add(
+          Cat(
+              cat[Strs.keyCatId], 
+              cat[Strs.keyCatName],
+              cat[Strs.keyCatPosition],
+              cat[Strs.keyCatSex],
+              cat[Strs.keyCatDescription],
+              cat[Strs.keyCatAvatar],
+              cat[Strs.keyCatImg]
+          )
+      );
+    });
   }
 
   @override
@@ -71,7 +83,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   children: <Widget>[
                     SizedBox.expand(
                         child: CachedNetworkImage(
-                          imageUrl: 'https://cat.lolli.tech/img/${index + 1}/1.JPG',
+                          imageUrl: catList[index].avatar,
                           fit: BoxFit.cover,
                           placeholder: (context, str) => Center(child: CircularProgressIndicator()),
                         )

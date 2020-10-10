@@ -1,3 +1,6 @@
+import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:flutter/material.dart';
 import 'widget/round_shape.dart';
@@ -36,6 +39,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
+    final loggedIn = UserStore().loggedIn.fetch();
     _scale = 1 - _curvedAnimation.value;
     return Scaffold(
       appBar: AppBar(
@@ -67,8 +71,15 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
                         AspectRatio(
                           aspectRatio: 25 / 11,
                           child: Image.asset(
-                              'assets/toast_neko.png',
+                              Strs.bannerToastNeko,
                               fit: BoxFit.cover),
+                        ),
+                        BlurryContainer(
+                          blur: 10,
+                          borderRadius: BorderRadius.circular(20),
+                          child: Center(
+                            child: Text('点我登录'),
+                          ),
                         ),
                         Positioned(
                             bottom: 5,
@@ -91,16 +102,16 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
             Column(
               children: [
                 SizedBox(height: 20.0),
-                Text('关于'),
+                Text(Strs.about),
                 SizedBox(height: 10.0),
-                SettingItem(title: '向我们反馈', onTap: () => Scaffold.of(context).showSnackBar(
+                SettingItem(title: Strs.feedback, onTap: () => Scaffold.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('请发送邮件至\n2036293523@qq.com'),
+                      content: Text(Strs.sendEmail),
                     ))
                 ),
-                SettingItem(title: '加入用户群', onTap: () => launchURL('https://jq.qq.com/?_wv=1027&k=86nHLzAl')),
+                SettingItem(title: Strs.joinUserGroup, onTap: () => launchURL(Strs.joinQQUrl)),
                 SizedBox(height: 20.0),
-                SettingItem(title: '使用帮助', onTap: () => showDialog(context: context, builder: (ctx){
+                SettingItem(title: Strs.usageHelp, onTap: () => showDialog(context: context, builder: (ctx){
                   return AlertDialog(
                     shape: RoundShape().build(),
                     content: SizedBox(
@@ -109,8 +120,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text('如果图片显示错误，请清除所有数据。'),
-                          Text('首页上下滑动，点击查看图片。')
+                          Text(Strs.photoWrongSolution),
+                          Text(Strs.helpText1)
                         ],
                       ),
                     ),
@@ -124,19 +135,32 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
                     ],
                   );
                 })),
-                /*Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _logInOutBtn(context, '重新登录', Colors.lightBlue, (){}),
-                    SizedBox(width: 40.0),
-                    _logInOutBtn(context, '退出登录', Colors.redAccent, (){})
-                  ],
-                ),*/
+                loggedIn
+                    ? _logInOutBtn(context, '退出登录', Colors.redAccent, (){})
+                    : Container()
+                ,
                 SizedBox(height: 40.0)
               ],
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _logInOutBtn(BuildContext context, String btnName, Color color,
+      GestureTapCallback onTap) {
+    return Container(
+      height: 35.0,
+      child: Material(
+        elevation: 10.0,
+        color: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(40.0)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: MaterialButton(
+            child: Text(btnName), textColor: Colors.white, onPressed: onTap),
       ),
     );
   }

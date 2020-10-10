@@ -36,6 +36,7 @@ dependencies:
       ref: master
   animated_splash_screen: ^1.0.1+2
   timeline_tile: ^1.0.0
+  path_provider: ^1.6.18
 
 dev_dependencies:
   flutter_test:

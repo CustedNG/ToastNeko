@@ -1,12 +1,9 @@
-import 'dart:convert';
-
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/photo.dart';
 import 'package:cat_gallery/position.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -25,46 +22,15 @@ class MyDetailPage extends StatefulWidget {
 class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClientMixin{
   Cat cat;
   int catIndex;
-  Map<String, dynamic> photoAmount = {
-    'Neko': 5,
-    'Tom': 4,
-    'Miao': 2,
-    'Mi': 1,
-    'Mao': 1
-  };
 
   _MyDetailPageState(Cat cat, int catIndex) {
     this.cat = cat;
     this.catIndex = catIndex;
   }
 
-  @override
-  void initState(){
-    super.initState();
-    getData();
-  }
-
-  void getData() async{
-    try {
-      Response response = await Dio().get('https://cat.lolli.tech/data/photo_amount.json');
-      if (response.statusCode == 200) {
-        photoAmount = jsonDecode(response.toString());
-      } else {
-        print('Http status ${response.statusCode}');
-      }
-    } catch (exception) {
-      print(exception);
-    }
-
-    if (!mounted) return;
-    setState(() {
-      print('Photo Amount Data: $photoAmount');
-    });
-  }
-
   Widget _buildCard(int index){
-    String url = 'https://cat.lolli.tech/img/${catIndex + 1}/${index + 1}.JPG';
-    bool isNotLast = index != photoAmount[cat.id];
+    String url = cat.img[index];
+    bool isNotLast = index != cat.img.length;
 
     return GestureDetector(
       onTap: () => isNotLast ? Navigator.push(
@@ -122,7 +88,7 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
           StaggeredGridView.countBuilder(
             physics: BouncingScrollPhysics(),
             crossAxisCount: 4,
-            itemCount: photoAmount[cat.id] + 1,
+            itemCount: cat.img.length + 1,
             itemBuilder: (BuildContext context, int index) => Hero(
                 tag: index == 0 ? cat : index.hashCode,
                 transitionOnUserGestures: true,

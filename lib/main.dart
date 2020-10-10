@@ -3,21 +3,29 @@ import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:dio/dio.dart';
+import 'package:cat_gallery/core/request.dart';
+import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/store/cat_store.dart';
 import 'package:hive/hive.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'home.dart';
 import 'model/navigation_item.dart';
 import 'utils.dart';
 import 'widget/round_shape.dart';
 import 'info.dart';
-import 'discuss.dart';
+
+Future<void> init() async {
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  Hive.init(appDocDir.path);
+}
 
 void main() {
-  Hive.init('');
+  WidgetsFlutterBinding.ensureInitialized();
+  init();
   runApp(MyApp());
 }
 
@@ -31,7 +39,7 @@ class MyApp extends StatelessWidget {
     }
 
     return MaterialApp(
-      title: '猫咪图库',
+      title: Strs.appName,
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: Colors.blue,
@@ -48,11 +56,11 @@ class MyApp extends StatelessWidget {
             child: AspectRatio(
               aspectRatio: 25 / 11,
               child: Image.asset(
-                  'assets/toast_neko.png',
+                  Strs.bannerToastNeko,
                   fit: BoxFit.cover),
             )
         ),
-        nextScreen: MyHomePage(title: 'Neko'),
+        nextScreen: MyHomePage(title: Strs.appName),
         duration: 1000,
         splashIconSize: 137,
         function: initData,
@@ -67,19 +75,28 @@ class MyApp extends StatelessWidget {
 }
 
 Future<void> initData() async {
-  Map<String, dynamic> photoUrls;
-  try {
-    Response response = await Dio().get('https://cat.lolli.tech/data/photo_amount.json');
-    if (response.statusCode == 200) {
-      photoUrls = jsonDecode(response.toString());
-    } else {
-      print('Http Status Code ${response.statusCode}');
-    }
-  } catch (exception) {
-    print(exception);
-  }
-
-  print('Photo Url Data: $photoUrls');
+  List<Map<String, dynamic>> jsonData;
+  await Request().go(
+      'get',
+      Strs.userGetAllCats,
+      success: (value){
+        jsonData = jsonDecode(value);
+        CatStore catStore;
+        jsonData.forEach((cat) => catStore.put(cat.toString()));
+      },
+      failed: (code) => print(code)
+  );
+  print('Cat Data: $jsonData');
+  await Request().go(
+      'get',
+      Strs.userGetAllCats,
+      success: (value){
+        jsonData = jsonDecode(value);
+        CatStore catStore;
+        jsonData.forEach((cat) => catStore.put(cat.toString()));
+      },
+      failed: (code) => print(code)
+  );
 }
 
 class MyHomePage extends StatefulWidget {
@@ -92,9 +109,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectIndex = 1;
-  PageController _pageController = PageController(initialPage: 1);
+  PageController _pageController = PageController(initialPage: 0);
   List<NavigationItem> items = [
-    NavigationItem(Icon(Icons.chat), Text('闲聊'), Colors.cyan),
     NavigationItem(Icon(Icons.home), Text('主页'), Colors.cyanAccent),
     NavigationItem(Icon(Icons.settings), Text('关于'), Colors.pinkAccent)
   ];
@@ -103,10 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: BouncingScrollPhysics(),
         controller: _pageController,
         children: [
-          DiscussPage(),
           HomePage(),
           InfoPage()
         ],
