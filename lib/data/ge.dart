@@ -3,39 +3,44 @@ class Strs{
   static const String baseUrl = 'https://neko.lacus.site';
   static const String apiVersion = '1';
   static const String baseApiUrl = baseUrl + '/v' + apiVersion;
+  static const String baseImgUrl = baseUrl + '/images/';
   static const String baseUserApiUrl = baseApiUrl + '/user';
   static const String baseAdminApiUrl = baseApiUrl + '/admin';
+  static const String baseCommonApiUrl = baseApiUrl + '/common';
 
   static const String userLogin = baseUserApiUrl + '/login';
   static const String userChangeNick = baseUserApiUrl + '/nick';
   static const String userClearNotification = baseUserApiUrl + '/clear';
-  static const String userGetAllCats = baseUserApiUrl + '/neko';
-  static const String userGetCatDetail = baseUserApiUrl + '/detail';
   static const String userComment = baseUserApiUrl + '/comment';
-  static const String userGetVersion = baseUserApiUrl + '/version';
 
-  static const String adminUpload = baseAdminApiUrl + '/upload';
-  static const String adminManageComment = baseAdminApiUrl + '/comment';
+  static const String publicGetVersion = baseCommonApiUrl + '/version';
+  static const String publicGetAllCats = baseCommonApiUrl + '/neko';
+  static const String publicGetCatDetail = baseCommonApiUrl + '/detail';
+  static const String publicDeleteComment = baseCommonApiUrl + '/comment';
+  static const String publicUploadPhoto = baseCommonApiUrl + '/upload';
+  static const String publicManagePosition = baseCommonApiUrl + '/neko/position';
+
+  static const String adminGetAllComment = baseAdminApiUrl + '/comment';
   static const String adminManageCat = baseAdminApiUrl + '/neko';
   static const String adminManageVersion = baseAdminApiUrl + '/version';
 
   //json
   static const String keyComment = 'comment';
   static const String keyCatInfo = 'neko_info';
-  static const String keyCatId = 'nekoid';
+  static const String keyCatId = 'neko_id';
   static const String keyCatName = 'name';
-  static const String keyCatArea = 'zone';
+  static const String keyCatZone = 'zone';
   static const String keyCatSex = 'sex';
   static const String keyCatDescription = 'description';
   static const String keyCatCourage = 'coward';
   static const String keyCatAppearRate = 'haunt';
   static const String keyCatAvatar = 'avatar';
-  static const String keyCatImg = 'img';
-  static const String keyCatPosition = 'position';
+  static const String keyCatImg = 'imgs';
+  static const String keyCatPosition = 'positions';
   static const String keyUserInfo = 'user_info';
   static const String keyUserAccount = 'cid';
   static const String keyUserPwd = 'pwd';
-  static const String keyUserId = 'openid';
+  static const String keyUserId = 'open_id';
   static const String keyUserName = 'nick';
   static const String keyUserImg = 'avatar';
   static const String keyCommentID = 'comment_id';

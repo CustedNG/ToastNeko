@@ -1,8 +1,11 @@
 import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/photo.dart';
 import 'package:cat_gallery/position.dart';
+import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/timeline.dart';
+import 'package:cat_gallery/utils.dart';
+import 'package:cat_gallery/widget/custom_image.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
@@ -24,27 +27,23 @@ class MyDetailPage extends StatefulWidget {
 
 class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClientMixin{
   Cat cat;
-  int catIndex;
 
   _MyDetailPageState(Cat cat, int catIndex) {
     this.cat = cat;
-    this.catIndex = catIndex;
   }
 
   Widget _buildCard(int index){
-    String url = cat.img[index];
     bool isNotLast = index != cat.img.length;
+    String url = Strs.baseImgUrl + cat.img[isNotLast ? index : 0];
 
     return GestureDetector(
-      onTap: () => isNotLast ? Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PhotoPage(
-                url: url,
-                index: index,
-                cat: cat,
-              )
-          )) : null,
+      onTap: () => isNotLast ? AppRoute(
+          PhotoPage(
+            url: url,
+            index: index,
+            cat: cat,
+          )
+      ).go(context) : null,
       child: Card(
         color: Colors.transparent,
         elevation: 20.0,
@@ -54,13 +53,10 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
         child: Stack(
           children: <Widget>[
             SizedBox.expand(
-                child: isNotLast ?
-                CachedNetworkImage(
-                  imageUrl: url,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) =>
-                      Icon(Icons.error),
-                ) : Center(child: Text('没有了\n(´･ω･`)'))
+                child: isNotLast ? MyImage(
+                  imgUrl: url,
+                  index: index,
+                ) : Center(child: Text('没有了\n(´･ω･`)')),
             ),
             isNotLast ? Positioned(
                 bottom: 0,
@@ -106,6 +102,9 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
         ],
       ),
       floatingActionButton: FabCircularMenu(
+        ringWidth: 77,
+        ringDiameter: 277,
+        ringColor: isDarkMode(context) ? Colors.black87 : Colors.white70,
         children: [
           IconButton(
               icon: Icon(Icons.map),
@@ -113,6 +112,7 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
                   context: context,
                   builder: (ctx){
                     return AlertDialog(
+                      contentPadding: EdgeInsets.fromLTRB(19, 20, 19, 7),
                       shape: RoundShape().build(),
                       title: Text('发现地'),
                       elevation: 20,
@@ -135,21 +135,13 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
           ),
           IconButton(
               icon: Icon(Icons.chat),
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChatPage()
-                  )
-              )
+              onPressed: () => AppRoute(ChatPage(catId: cat.id)).go(context)
           ),
           IconButton(
               icon: Icon(Icons.alt_route),
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => TimelinePage()
-                  )
-              )
+              onPressed: () => AppRoute(
+                  TimelinePage(catId: cat.id, catName: cat.displayName)
+              ).go(context)
           )
         ],
       )

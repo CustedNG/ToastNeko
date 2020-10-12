@@ -38,6 +38,7 @@ dependencies:
   timeline_tile: ^1.0.0
   path_provider: ^1.6.18
   fab_circular_menu: ^1.0.1
+  expand_widget: 1.1.0
 
 dev_dependencies:
   flutter_test:

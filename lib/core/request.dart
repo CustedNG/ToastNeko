@@ -2,13 +2,13 @@ import 'package:dio/dio.dart';
 
 class Request {
   Response response;
-  Dio dio;
+  Dio dio = Dio();
 
-  Future<Response> go(String method, String url,
+  Future<void> go(String method, String url,
       {dynamic data, Function success, Function failed}) async {
     switch(method){
       case 'get':
-        response = await dio.get(url);
+        response = await dio.get(url, queryParameters: data);
         break;
       case 'post':
         if(data == null)return null;

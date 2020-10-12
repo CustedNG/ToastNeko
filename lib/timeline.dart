@@ -1,111 +1,195 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:cat_gallery/core/request.dart';
+import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/store/cat_store.dart';
+import 'package:cat_gallery/store/user_store.dart';
+import 'package:cat_gallery/utils.dart';
+import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class TimelinePage extends StatefulWidget {
+  final catId;
+  final catName;
+
+  const TimelinePage({Key key, this.catId, this.catName}) : super(key: key);
+
   @override
   _TimelinePageState createState() => _TimelinePageState();
 }
 
 class _TimelinePageState extends State<TimelinePage> {
   List<Step> _steps;
+  bool isBusy;
+  bool isUploading = false;
+  final textFieldController = TextEditingController();
+  final textFieldController2 = TextEditingController();
+  List<Color> colorList = [
+    Colors.cyan,
+    Colors.pinkAccent,
+    Colors.yellow,
+    Colors.lightGreen,
+    Colors.tealAccent,
+    Colors.purple,
+    Colors.brown,
+    Colors.indigo
+  ];
+  List<IconData> iconList = [
+    Icons.architecture,
+    Icons.search,
+    Icons.flag,
+    Icons.navigation,
+    Icons.local_library,
+    Icons.home
+  ];
 
   @override
   void initState() {
-    _steps = _generateData();
+    isBusy = true;
+    initData();
     super.initState();
+  }
+
+  void initData() async{
+    _steps = [];
+    final catStore = CatStore();
+    await catStore.init();
+    Map<String, dynamic> jsonData = json.decode(catStore.fetch(widget.catId));
+    final positions = jsonData[Strs.keyCatPosition];
+    for(Map<String, dynamic> position in positions){
+      if(_steps.isEmpty)_steps.add(
+          Step(
+            type: Type.line,
+            duration: position['duration'],
+            color: colorList[Random().nextInt(7)],
+          )
+      );
+      _steps.add(
+          Step(
+            type: Type.checkpoint,
+            message: position['time'],
+            color: colorList[Random().nextInt(7)],
+            icon: iconList[Random().nextInt(5)]
+          )
+      );
+      _steps.add(
+          Step(
+              type: Type.line,
+              duration: position['duration'],
+              message: //position['nick'] + '发现' +
+                   widget.catName +
+                  '在' + position['msg'],
+              color: colorList[Random().nextInt(7)],
+          )
+      );
+    }
+    setState(() {
+      isBusy = false;
+    });
+  }
+
+  InputDecoration _buildDecoration(String label){
+    return InputDecoration(
+        labelText: label,
+    );
+  }
+
+  String nowTime(){
+    final dateTime = DateTime.now();
+    return '${dateTime.year}-${dateTime.month}-${dateTime.day} '
+        '${dateTime.hour}:${dateTime.minute}';
+  }
+  
+  void tryUpload() async{
+    if(isUploading)return;
+    isUploading = true;
+    setState(() {});
+
+    final user = UserStore();
+    await user.init();
+    await Request().go(
+        'put',
+        Strs.publicManagePosition,
+        data: {
+          "neko_id": widget.catId,
+          "position": {
+            "location": textFieldController.value.text,
+            "time": nowTime(),
+            "duration": 0,
+            "msg": textFieldController2.value.text,
+            "open_id": user.openId.fetch()
+          }
+        },
+        success: (body) async {
+          await initCatData();
+          setState(() {
+            initData();
+            isUploading = false;
+            Navigator.of(context).pop();
+          });
+        },
+        failed: (code) => print(code)
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text('${widget.catName}的行踪'),
         centerTitle: true,
       ),
       body: Theme(
         data: Theme.of(context).copyWith(
           accentColor: Colors.white.withOpacity(0.2),
         ),
-        child: Padding(
-          padding: EdgeInsets.only(top: 20),
-          child: Center(
-            child: _TimelineActivity(steps: _steps),
-          ),
+        child: Center(
+          child: isBusy
+              ? CircularProgressIndicator()
+              : _TimelineActivity(steps: _steps),
         )
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (ctx){
+              return AlertDialog(
+                shape: RoundShape().build(),
+                title: Text('我发现了${widget.catName}'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: textFieldController,
+                      decoration: _buildDecoration('${widget.catName}在哪里'),
+                    ),
+                    TextField(
+                      controller: textFieldController2,
+                      decoration: _buildDecoration('${widget.catName}在干什么'),
+                    ),
+                  ],
+                ),
+                actions: [
+                  FlatButton(
+                      onPressed: (){
+                        setState(() {});
+                        tryUpload();
+                      },
+                      child: isUploading
+                          ? CircularProgressIndicator()
+                          : Text('提交${widget.catName}行踪')
+                  )
+                ],
+              );
+            }
+          );
+        },
+        child: Icon(Icons.remove_red_eye),
+      ),
     );
-  }
-
-  List<Step> _generateData() {
-    return <Step>[
-      Step(
-        type: Type.checkpoint,
-        icon: Icons.architecture,
-        message: '东1教',
-        hour: '8.38',
-        duration: 2,
-        color: const Color(0xFFF2F2F2),
-      ),
-      Step(
-        type: Type.line,
-        message: '树林休息',
-        duration: 9,
-        color: const Color(0xFF40C752),
-      ),
-      Step(
-        type: Type.line,
-        hour: '8:47',
-        message: '门口转悠',
-        duration: 12,
-        color: const Color(0xFF797979),
-      ),
-      Step(
-        type: Type.checkpoint,
-        icon: Icons.work,
-        hour: '9:02',
-        message: '东区学子亭',
-        duration: 2,
-        color: const Color(0xFFF2F2F2),
-      ),
-      Step(
-        type: Type.line,
-        hour: '12:12',
-        message: '睡觉觉',
-        duration: 8,
-        color: const Color(0xFF40C752),
-      ),
-      Step(
-        type: Type.checkpoint,
-        icon: Icons.local_drink,
-        hour: '12:20',
-        message: '在树下！',
-        duration: 2,
-        color: const Color(0xFFF2F2F2),
-      ),
-      Step(
-        type: Type.line,
-        hour: '01:05',
-        message: '觅食ing',
-        duration: 8,
-        color: const Color(0xFF40C752),
-      ),
-      Step(
-        type: Type.line,
-        icon: Icons.work,
-        hour: '01:13',
-        message: '消失了～',
-        duration: 2,
-        color: const Color(0xFFF2F2F2),
-      ),
-      Step(
-        type: Type.checkpoint,
-        hour: '05:42',
-        icon: Icons.home,
-        message: '东1教',
-        duration: 2,
-        color: const Color(0xFFF2F2F2),
-      ),
-    ];
   }
 }
 
@@ -137,7 +221,7 @@ class _TimelineActivity extends StatelessWidget {
           alignment: TimelineAlign.manual,
           isFirst: index == 0,
           isLast: index == steps.length - 1,
-          lineXY: 0.25,
+          lineXY: 0.15,
           indicatorStyle: indicator,
           startChild: leftChild,
           endChild: rightChild,
@@ -165,7 +249,7 @@ class _TimelineActivity extends StatelessWidget {
         child: Center(
           child: Icon(
             step.icon,
-            color: const Color(0xFF1D1E20),
+            color: Colors.white,
             size: 30,
           ),
         ),
@@ -190,19 +274,18 @@ class _RightChildTimeline extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+
           Padding(
             padding: EdgeInsets.only(
-                left: step.isCheckpoint ? 20 : 39, top: 8, bottom: 8, right: 8),
-            child: RichText(
-              text: TextSpan(children: <TextSpan>[
-                TextSpan(
-                  text: step.message,
-                ),
-                TextSpan(
-                  text: '  ${step.duration} 分钟',
-                )
-              ]),
-            ),
+                left: step.isCheckpoint ? 20 : 39,
+                top: 8,
+                bottom: 8,
+                right: 8),
+            child: Text(
+              step.type == Type.checkpoint
+                  ? '${step.message}'
+                  : step.message ?? '',
+            )
           )
         ],
       ),
@@ -221,7 +304,7 @@ class _LeftChildTimeline extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(right: step.isCheckpoint ? 10 : 29),
+          padding: EdgeInsets.only(top: 40, right: step.isCheckpoint ? 10 : 29),
           child: Text(
             step.hour,
             textAlign: TextAlign.center,

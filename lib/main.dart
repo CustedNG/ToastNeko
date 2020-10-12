@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
-import 'package:cat_gallery/store/cat_store.dart';
 import 'package:hive/hive.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +24,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   init();
   runApp(MyApp());
+  Future.delayed(Duration(milliseconds: 77), () => initCatData());
 }
 
 class MyApp extends StatelessWidget {
@@ -63,7 +61,6 @@ class MyApp extends StatelessWidget {
         nextScreen: MyHomePage(title: Strs.appName),
         duration: 1000,
         splashIconSize: 137,
-        function: initData,
         backgroundColor: Color.fromRGBO(243, 233, 198, 1),
         curve: Curves.easeInOutCubic,
         animationDuration: Duration(milliseconds: 777),
@@ -72,31 +69,6 @@ class MyApp extends StatelessWidget {
       )
     );
   }
-}
-
-Future<void> initData() async {
-  List<Map<String, dynamic>> jsonData;
-  await Request().go(
-      'get',
-      Strs.userGetAllCats,
-      success: (value){
-        jsonData = jsonDecode(value);
-        CatStore catStore;
-        jsonData.forEach((cat) => catStore.put(cat.toString()));
-      },
-      failed: (code) => print(code)
-  );
-  print('Cat Data: $jsonData');
-  await Request().go(
-      'get',
-      Strs.userGetAllCats,
-      success: (value){
-        jsonData = jsonDecode(value);
-        CatStore catStore;
-        jsonData.forEach((cat) => catStore.put(cat.toString()));
-      },
-      failed: (code) => print(code)
-  );
 }
 
 class MyHomePage extends StatefulWidget {
@@ -108,7 +80,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectIndex = 1;
+  int _selectIndex = 0;
   PageController _pageController = PageController(initialPage: 0);
   List<NavigationItem> items = [
     NavigationItem(Icon(Icons.home), Text('主页'), Colors.cyanAccent),
@@ -119,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        physics: BouncingScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         controller: _pageController,
         children: [
           HomePage(),

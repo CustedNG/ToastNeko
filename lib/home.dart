@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
+import 'package:cat_gallery/widget/custom_image.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,37 +18,51 @@ class HomePage extends StatefulWidget{
   State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin{
   int _index;
   double _padding;
-  FixedExtentScrollController _fixedExtentScrollController = FixedExtentScrollController(initialItem: 4);
+  FixedExtentScrollController _fixedExtentScrollController;
   List<Cat> catList = new List<Cat>();
   bool isOnTap = false;
   AnimationController _controller;
   CurvedAnimation _curvedAnimation;
   double _scale;
-  
-  _HomePageState() {
-    final catData = CatStore().fetchAll();
-    _index = catData.length - 1;
-    catData.forEach((cat){
+  CatStore catStore = CatStore();
+  bool isBusy = true;
+  Map<String, dynamic> catData;
+
+  Future<void> initData() async {
+    await catStore.init();
+    catData = json.decode(catStore.allCats.fetch());
+    final nekoList = catData['neko_list'];
+    _index = nekoList.length - 1;
+    _fixedExtentScrollController = FixedExtentScrollController(initialItem: _index);
+    nekoList.forEach((cat){
+      Map<String, dynamic> catJson = json.decode(catStore.fetch(cat[Strs.keyCatId]));
+      List<String> imgs = [];
+      catJson[Strs.keyCatImg].forEach((url) => imgs.add(url));
       catList.add(
           Cat(
-              cat[Strs.keyCatId], 
-              cat[Strs.keyCatName],
-              cat[Strs.keyCatPosition],
-              cat[Strs.keyCatSex],
-              cat[Strs.keyCatDescription],
-              cat[Strs.keyCatAvatar],
-              cat[Strs.keyCatImg]
+              catJson[Strs.keyCatId],
+              catJson[Strs.keyCatName],
+              catJson[Strs.keyCatZone],
+              catJson[Strs.keyCatSex],
+              catJson[Strs.keyCatDescription],
+              catJson[Strs.keyCatAvatar],
+              imgs
           )
       );
+    });
+    setState(() {
+      isBusy = false;
     });
   }
 
   @override
   void initState() {
     super.initState();
+    initData();
     _controller = AnimationController(
       vsync: this,
       lowerBound: 0.0,
@@ -82,10 +99,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 child: Stack(
                   children: <Widget>[
                     SizedBox.expand(
-                        child: CachedNetworkImage(
-                          imageUrl: catList[index].avatar,
-                          fit: BoxFit.cover,
-                          placeholder: (context, str) => Center(child: CircularProgressIndicator()),
+                        child: MyImage(
+                          imgUrl: Strs.baseImgUrl + catList[index].avatar,
+                          index: index,
                         )
                     ),
                     Positioned(
@@ -112,7 +128,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                             SizedBox(height: 10.0),
                             Text(
-                              '${catList[index].position} · ${catList[index].sex == '未知' ? '未知' : catList[index].sex + '孩子'}',
+                              '${catList[index].position} · '
+                                  '${catList[index].sex == '未知'
+                                  ? '未知性别' : catList[index].sex + '孩子'}',
                               textScaleFactor: 1.0,
                               style: TextStyle(color: Colors.grey, fontSize: 19),
                             )
@@ -138,21 +156,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     double width = size.width;
     _padding = width / 12;
 
-    return Stack(
+    return isBusy ? Center(child: CircularProgressIndicator()) : Stack(
       children: [
         GestureDetector(
           onTapDown: (detail) => _controller.forward(),
           onTapUp: (detail) => _controller.reverse(),
           onTapCancel: () => _controller.reverse(),
-          onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MyDetailPage(
-                      cat: catList[_index],
-                      catIndex: _index
-                  )
+          onTap: () => AppRoute(
+              MyDetailPage(
+                  cat: catList[_index]
               )
-          ),
+          ).go(context),
           onVerticalDragUpdate: (updateDetail) {
             if(updateDetail.delta.dy < -10){
               if(_index == catList.length - 1){
@@ -193,7 +207,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             physics: NeverScrollableScrollPhysics(),
             childDelegate: ListWheelChildBuilderDelegate(
                 builder: (context, index) => _buildList(context, index, height, width),
-                childCount: catList.length),
+                childCount: catList.length
+            ),
           ),
         ),
         StatusBarOverlay()

@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:cat_gallery/core/request.dart';
+import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/store/user_store.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,7 +21,29 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => isBusy = true);
 
+    final username = usernameController.value.text;
+    final password = passwordController.value.text;
+
     try {
+      await Request().go(
+          'post',
+          Strs.userLogin,
+          data: {
+            'cid': username,
+            'pwd': password
+          },
+          success: (body) async {
+            print(body);
+            final userStore = UserStore();
+            await userStore.init();
+            userStore.username.put(username);
+            userStore.password.put(password);
+            Map<String, dynamic> jsonData = json.decode(body);
+            userStore.openId.put(jsonData[Strs.keyUserId]);
+            Navigator.of(context).pop();
+          },
+          failed: (code) => print(code)
+      );
     } catch (e) {
       rethrow;
     } finally {
@@ -31,7 +58,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _buildLoginForm(context)
+      body: _buildLoginForm(context),
+      backgroundColor: Colors.teal,
     );
   }
 
@@ -42,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
         border: OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: Colors.cyan
+                color: Colors.lightBlueAccent
             )
         )
     );
@@ -50,21 +78,16 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildLoginForm(BuildContext context) {
     return ListView(
-      // mainAxisSize: MainAxisSize.min,
-      // crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20),
-              FlatButton(
+              IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 padding: EdgeInsets.all(0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Icon(Icons.arrow_back_ios, color: Colors.white),
-                ),
+                icon: Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               SizedBox(height: 47),
               _title(),
@@ -139,8 +162,8 @@ class _LoginPageState extends State<LoginPage> {
           'Toast Neko',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
             fontSize: 60,
+            color: Colors.white,
           ),
         )
       ],
