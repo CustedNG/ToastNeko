@@ -1,10 +1,10 @@
-import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/login.dart';
 import 'package:cat_gallery/route.dart';
-import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'widget/round_shape.dart';
 import 'widget/setting_item.dart';
 
@@ -17,12 +17,10 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
   AnimationController _controller;
   CurvedAnimation _curvedAnimation;
   double _scale;
-  UserStore userStore;
-  bool loggedIn = false;
+  UserProvider user;
 
   @override
   void initState() {
-    initData();
     super.initState();
     _controller = AnimationController(
       vsync: this,
@@ -36,14 +34,6 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
     )..addListener(() { setState(() {});});
   }
 
-  Future<void> initData() async {
-    userStore = UserStore();
-    await userStore.init();
-    setState(() {
-      loggedIn = userStore.loggedIn.fetch();
-    });
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -52,7 +42,10 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
+    user = Provider.of<UserProvider>(context);
     _scale = 1 - _curvedAnimation.value;
+
+    if(user.isBusy)return CircularProgressIndicator();
 
     return Scaffold(
       appBar: AppBar(
@@ -76,7 +69,6 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
               onTap: (){
                 _controller.forward();
                 Future.delayed(Duration(milliseconds: 300), () => _controller.reverse());
-                AppRoute(LoginPage()).go(context);
               },
               child: Transform.scale(
                 scale: _scale,
@@ -129,19 +121,17 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
         SizedBox(height: 20.0),
         Text(Strs.about),
         SizedBox(height: 10.0),
-        SettingItem(title: Strs.feedback, onTap: () => Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text(Strs.sendEmail),
-            ))
-        ),
         SettingItem(title: Strs.joinUserGroup, onTap: () => launchURL(Strs.joinQQUrl)),
         SizedBox(height: 20.0),
-        SettingItem(title: Strs.usageHelp, onTap: () => showDialog(context: context, builder: (ctx){
-          return _buildAlertDialog(context);
-        })),
-        loggedIn
-            ? _logInOutBtn(context, '退出登录', Colors.redAccent, (){})
-            : Container()
+        SettingItem(title: Strs.usageHelp, onTap: () =>
+            showDialog(context: context, builder: (ctx){
+              return _buildAlertDialog(context);
+            })
+        ),
+        SizedBox(height: 40),
+        !user.loggedIn
+            ? _logInOutBtn(context, '登录', Colors.redAccent, () => AppRoute(LoginPage()).go(context))
+            : _logInOutBtn(context, '退出登录', Colors.redAccent, () => user.logout())
         ,
         SizedBox(height: 40.0)
       ],

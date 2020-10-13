@@ -17,12 +17,25 @@ void launchURL(String url) async {
   }
 }
 
-Future<void> initCatData() async {
-  List<String> catId = [];
+Future<void> initCatData([String nekoId]) async {
   Map<String, dynamic> jsonData;
   final catStore = CatStore();
   await catStore.init();
-
+  
+  if(nekoId != null){
+    await Request().go(
+        'get',
+        Strs.publicGetCatDetail,
+        data: {'neko_id': nekoId},
+        success: (value) async {
+          jsonData = json.decode(value);
+          catStore.put(nekoId, json.encode(jsonData));
+        },
+        failed: (code) => print(code)
+    );
+    return;
+  }
+  List<String> catId = [];
   await Request().go(
       'get',
       Strs.publicGetAllCats,
@@ -46,3 +59,13 @@ Future<void> initCatData() async {
     );
   }
 }
+
+void showSnackBar(BuildContext context, String content){
+  Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(content),
+      )
+  );
+}
+
+void unawaited(Future<void> future) {}

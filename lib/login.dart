@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/store/user_store.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   final passwordFocusNode = FocusNode();
   bool isBusy = false;
+  final userStore = locator<UserStore>();
 
   Future<void> tryLogin() async {
     if (isBusy) return;
@@ -32,12 +36,10 @@ class _LoginPageState extends State<LoginPage> {
             'cid': username,
             'pwd': password
           },
-          success: (body) async {
-            print(body);
-            final userStore = UserStore();
-            await userStore.init();
+          success: (body){
             userStore.username.put(username);
             userStore.password.put(password);
+            Provider.of<UserProvider>(context).login();
             Map<String, dynamic> jsonData = json.decode(body);
             userStore.openId.put(jsonData[Strs.keyUserId]);
             Navigator.of(context).pop();
@@ -53,6 +55,17 @@ class _LoginPageState extends State<LoginPage> {
 
   void focusOnPasswordField() {
     FocusScope.of(context).requestFocus(passwordFocusNode);
+  }
+
+  void autoFillText(){
+    usernameController.text = userStore.username.fetch();
+    passwordController.text = userStore.password.fetch();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    autoFillText();
   }
 
   @override

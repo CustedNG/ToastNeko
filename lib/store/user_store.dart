@@ -7,6 +7,8 @@ class UserStore with PresistentStore {
   StoreProperty<String> get username => property('username');
   StoreProperty<String> get password => property('password');
   StoreProperty<String> get openId => property('openId');
+  StoreProperty<String> get nick => property('nick');
+  StoreProperty<String> get lastCommentTime => property('lastCommentTime');
   StoreProperty<bool> get savePassword => property('savePassword', defaultValue: false);
   StoreProperty<bool> get loggedIn => property('loggedIn', defaultValue: false);
 }

@@ -3,11 +3,16 @@ import 'dart:math';
 
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/locator.dart';
+import 'package:cat_gallery/login.dart';
+import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class TimelinePage extends StatefulWidget {
@@ -24,8 +29,13 @@ class _TimelinePageState extends State<TimelinePage> {
   List<Step> _steps;
   bool isBusy;
   bool isUploading = false;
+
   final textFieldController = TextEditingController();
   final textFieldController2 = TextEditingController();
+  final userStore = locator<UserStore>();
+  UserProvider user;
+  final catStore = locator<CatStore>();
+
   List<Color> colorList = [
     Colors.cyan,
     Colors.pinkAccent,
@@ -52,10 +62,14 @@ class _TimelinePageState extends State<TimelinePage> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    user = Provider.of<UserProvider>(context);
+  }
+
   void initData() async{
     _steps = [];
-    final catStore = CatStore();
-    await catStore.init();
     Map<String, dynamic> jsonData = json.decode(catStore.fetch(widget.catId));
     final positions = jsonData[Strs.keyCatPosition];
     for(Map<String, dynamic> position in positions){
@@ -96,42 +110,87 @@ class _TimelinePageState extends State<TimelinePage> {
     );
   }
 
-  String nowTime(){
+  String nowDIYTime(){
     final dateTime = DateTime.now();
     return '${dateTime.year}-${dateTime.month}-${dateTime.day} '
         '${dateTime.hour}:${dateTime.minute}';
+  }
+
+  bool isInputNotRubbish(List<TextEditingController> controllers){
+    for(var controller in controllers){
+      if(controller.text.length < 2 || controller.text.length > 10)return false;
+    }
+    return true;
+  }
+
+  void showWrongDialog(String wrongMsg){
+    showDialog(
+        context: context,
+        builder: (ctx){
+          return AlertDialog(
+            shape: RoundShape().build(),
+            content: Text(wrongMsg),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('确定')
+              )
+            ],
+          );
+        }
+    );
   }
   
   void tryUpload() async{
     if(isUploading)return;
     isUploading = true;
     setState(() {});
+    final lastTime = userStore.lastCommentTime.fetch();
+    final nowTime = DateTime.now();
+    final textValue1 = textFieldController.value.text;
+    final textValue2 = textFieldController2.value.text;
 
-    final user = UserStore();
-    await user.init();
+    if(!isInputNotRubbish([textFieldController, textFieldController2])){
+      showWrongDialog('每项输入不得小于2大于10');
+      isUploading = false;
+      return;
+    }
+
+    if(lastTime != null){
+      if(nowTime.difference(DateTime.parse(lastTime)).inMinutes < 10){
+        showWrongDialog('每次上报间隔不小于十分钟');
+        isUploading = false;
+        return;
+      }
+    }
+
     await Request().go(
         'put',
         Strs.publicManagePosition,
         data: {
-          "neko_id": widget.catId,
-          "position": {
-            "location": textFieldController.value.text,
-            "time": nowTime(),
-            "duration": 0,
-            "msg": textFieldController2.value.text,
-            "open_id": user.openId.fetch()
+          'neko_id': widget.catId,
+          'position': {
+            'location': textValue1,
+            'time': nowDIYTime(),
+            'duration': 0,
+            'nick': userStore.nick.fetch(),
+            'msg': textValue2,
+            'open_id': userStore.openId.fetch()
           }
         },
         success: (body) async {
-          await initCatData();
+          await initCatData(widget.catId);
           setState(() {
             initData();
-            isUploading = false;
+            textFieldController.clear();
+            textFieldController2.clear();
+            userStore.lastCommentTime.put(nowTime.toString());
             Navigator.of(context).pop();
           });
         },
         failed: (code) => print(code)
     );
+    isUploading = false;
   }
 
   @override
@@ -152,35 +211,39 @@ class _TimelinePageState extends State<TimelinePage> {
         )
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
+          final catName = widget.catName;
+          bool isLogin = user.loggedIn;
           showDialog(
             context: context,
             builder: (ctx){
               return AlertDialog(
                 shape: RoundShape().build(),
-                title: Text('我发现了${widget.catName}'),
+                title: Text(isLogin ? '我发现了$catName': '是否登录？'),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
+                    isLogin ? TextField(
                       controller: textFieldController,
-                      decoration: _buildDecoration('${widget.catName}在哪里'),
-                    ),
-                    TextField(
+                      decoration: _buildDecoration('$catName在哪里'),
+                    ) : Text('需要登录才可以反馈$catName的行踪'),
+                    isLogin ? TextField(
                       controller: textFieldController2,
-                      decoration: _buildDecoration('${widget.catName}在干什么'),
-                    ),
+                      decoration: _buildDecoration('$catName在干什么'),
+                    ) : Container(),
                   ],
                 ),
                 actions: [
                   FlatButton(
                       onPressed: (){
+                        isLogin
+                            ? tryUpload()
+                            : AppRoute(LoginPage()).go(context);
                         setState(() {});
-                        tryUpload();
                       },
                       child: isUploading
                           ? CircularProgressIndicator()
-                          : Text('提交${widget.catName}行踪')
+                          : Text(isLogin? '提交${widget.catName}行踪' : '登录')
                   )
                 ],
               );
