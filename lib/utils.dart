@@ -79,7 +79,6 @@ Future<void> checkVersion(BuildContext context) async {
       success: (data){
         Map<String, dynamic> jsonData = json.decode(data);
         int version = int.parse(jsonData['version']);
-        print(version > Strs.versionCode);
         if(version > Strs.versionCode)AppRoute(
             UpdatePage(
               version: version,
