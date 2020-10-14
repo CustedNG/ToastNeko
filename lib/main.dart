@@ -15,6 +15,7 @@ Future<void> init() async {
   Hive.init(appDocDir.path);
   await setupLocator(appDocDir.path);
   locator<UserProvider>().loadLocalData();
+  locator<CatProvider>().loadLocalData();
 }
 
 void main() async {

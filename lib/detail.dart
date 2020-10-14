@@ -1,8 +1,15 @@
+import 'dart:convert';
+
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/intro.dart';
+import 'package:cat_gallery/locator.dart';
+import 'package:cat_gallery/model/cat.dart';
+import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/photo.dart';
 import 'package:cat_gallery/position.dart';
 import 'package:cat_gallery/route.dart';
+import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/timeline.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/custom_image.dart';
@@ -12,36 +19,53 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-import 'discuss.dart';
-import 'model/cat.dart';
-
-class MyDetailPage extends StatefulWidget {
+class DetailPage extends StatefulWidget {
   final Cat cat;
   final int catIndex;
 
-  MyDetailPage({Key key, this.cat, this.catIndex}) : super(key: key);
+  DetailPage({Key key, this.cat, this.catIndex}) : super(key: key);
 
   @override
-  _MyDetailPageState createState() => _MyDetailPageState(cat, catIndex);
+  _DetailPageState createState() => _DetailPageState();
 }
 
-class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClientMixin{
-  Cat cat;
+class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMixin{
+  final _catStore = locator<CatStore>();
+  List<Comment> _comments = [];
+  int _commentsLen;
 
-  _MyDetailPageState(Cat cat, int catIndex) {
-    this.cat = cat;
+  @override
+  void initState(){
+    super.initState();
+    initData();
+  }
+
+  void initData(){
+    final commentsData = json.decode(_catStore.fetch(widget.cat.id))[Strs.keyComment];
+    for(Map<String, dynamic> comment in commentsData){
+      _comments.add(
+          Comment(
+              comment[Strs.keyCommentContent],
+              comment[Strs.keyUserInfo][Strs.keyUserName],
+              comment[Strs.keyCommentID],
+              comment[Strs.keyUserInfo][Strs.keyUserId],
+              comment[Strs.keyCreateTime]
+          )
+      );
+    }
+    _commentsLen = _comments.length;
   }
 
   Widget _buildCard(int index){
-    bool isNotLast = index != cat.img.length;
-    String url = Strs.baseImgUrl + cat.img[isNotLast ? index : 0];
+    bool isNotLast = index != widget.cat.img.length;
+    String url = Strs.baseImgUrl + widget.cat.img[isNotLast ? index : 0];
 
     return GestureDetector(
       onTap: () => isNotLast ? AppRoute(
           PhotoPage(
             url: url,
             index: index,
-            cat: cat,
+            cat: widget.cat,
           )
       ).go(context) : null,
       child: Card(
@@ -65,7 +89,7 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
                   width: MediaQuery.of(context).size.width - 60,
                   borderRadius: BorderRadius.zero,
                   child: Text(
-                    '${index + 1}',
+                    index < _commentsLen ? _comments[index].content : '暂无评论',
                     textScaleFactor: 1.0,
                     style: TextStyle(
                         color: Colors.white, fontSize: 12),
@@ -87,9 +111,9 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
           StaggeredGridView.countBuilder(
             physics: BouncingScrollPhysics(),
             crossAxisCount: 4,
-            itemCount: cat.img.length + 1,
+            itemCount: widget.cat.img.length + 1,
             itemBuilder: (BuildContext context, int index) => Hero(
-                tag: index == 0 ? cat : index.hashCode,
+                tag: index == 0 ? widget.cat : index.hashCode,
                 transitionOnUserGestures: true,
                 child: _buildCard(index)
             ),
@@ -120,7 +144,7 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
                       content: SizedBox(
                         height: 270 * 0.618,
                         child: ClipRect(
-                          child: Maps.search(cat.position),
+                          child: Maps.search(widget.cat.position),
                         ),
                       ),
                       actions: <Widget>[
@@ -135,13 +159,20 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
                   })
           ),
           IconButton(
-              icon: Icon(Icons.chat),
-              onPressed: () => AppRoute(ChatPage(catId: cat.id)).go(context)
+              icon: Icon(Icons.info_outline),
+              onPressed: () => AppRoute(
+                  IntroPage(
+                      cat: widget.cat,
+                  )
+              ).go(context)
           ),
           IconButton(
               icon: Icon(Icons.alt_route),
               onPressed: () => AppRoute(
-                  TimelinePage(catId: cat.id, catName: cat.displayName)
+                  TimelinePage(
+                      catId: widget.cat.id,
+                      catName: widget.cat.displayName
+                  )
               ).go(context)
           )
         ],

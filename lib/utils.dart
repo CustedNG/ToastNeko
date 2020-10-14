@@ -79,13 +79,16 @@ Future<void> checkVersion(BuildContext context) async {
       success: (data){
         Map<String, dynamic> jsonData = json.decode(data);
         int version = int.parse(jsonData['version']);
-        if(version > Strs.versionCode)AppRoute(
-            UpdatePage(
-              version: version,
-              android: jsonData['android'],
-              ios: jsonData['ios'],
-            )
-        ).go(context);
+        if(version > Strs.versionCode){
+          AppRoute(
+              UpdatePage(
+                version: version,
+                android: jsonData['android'],
+                ios: jsonData['ios'],
+              )
+          ).go(context);
+          print('Update version:$version available');
+        }
       }
   );
 }
@@ -99,9 +102,10 @@ void showToast(BuildContext context, String content, bool isLong) =>
       duration: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
       gravity: Toast.BOTTOM);
 
-bool isInputNotRubbish(List<TextEditingController> controllers){
+bool isInputNotRubbish(List<TextEditingController> controllers, [int max, int min]){
   for(var controller in controllers){
-    if(controller.text.length < 2 || controller.text.length > 10)return false;
+    if(controller.text.length < (min ?? 2) || controller.text.length > (max ?? 10))
+      return false;
   }
   return true;
 }

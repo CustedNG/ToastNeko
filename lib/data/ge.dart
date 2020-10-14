@@ -50,7 +50,7 @@ class Strs{
   static const String keyCommentContent = 'content';
   static const String keyReply = 'reply';
   static const String keyReplyId = 'reply_id';
-  static const String keyReplyCreateTime = 'create_time';
+  static const String keyCreateTime = 'create_time';
 
   //app
   static const String appName = 'Toast Neko';

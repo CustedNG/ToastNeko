@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage>
           onTapUp: (detail) => _controller.reverse(),
           onTapCancel: () => _controller.reverse(),
           onTap: () => AppRoute(
-              MyDetailPage(
+              DetailPage(
                   cat: catList[_index]
               )
           ).go(context),

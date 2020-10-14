@@ -1,3 +1,4 @@
+import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/login.dart';
@@ -20,6 +21,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
   CurvedAnimation _curvedAnimation;
   double _scale;
   UserProvider _user;
+  bool _isChangingNick;
 
   final _nickController = TextEditingController();
   final _nickFocusNode = FocusNode();
@@ -27,6 +29,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
   @override
   void initState() {
     super.initState();
+    _isChangingNick = false;
     _controller = AnimationController(
       vsync: this,
       lowerBound: 0.0,
@@ -170,8 +173,30 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
     );
   }
 
-  void tryChangeNick(){
-    if(!isInputNotRubbish([_nickController]))return;
+  Future<void> tryChangeNick() async {
+    if(_isChangingNick)return;
+
+    if(!isInputNotRubbish([_nickController], 12, 4)){
+      showWrongDialog(context, '昵称不得长于12小与4');
+      return;
+    }
+    
+    await Request().go(
+        'put',
+        Strs.userChangeNick,
+        data: {
+          Strs.keyUserId : _user.openId,
+          Strs.keyUserName : _nickController.value.text
+        },
+        success: (data){
+          _user.setNick(_nickController.value.text);
+          Navigator.of(context).pop();
+          _nickController.clear();
+          showToast(context, '修改昵称成功', false);
+        },
+        failed: (code) => showToast(context, '错误码 $code', false)
+    );
+    _isChangingNick = false;
   }
 
   void _buildNickDialog(BuildContext context) {
@@ -187,16 +212,20 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
               controller: _nickController,
               focusNode: _nickFocusNode,
               style: TextStyle(color: Colors.white),
-              obscureText: true,
               decoration: buildDecoration('想要的新昵称'),
-              onSubmitted: (_) => tryChangeNick(),
             )
           ],
         ),
         [
-          FlatButton(child: Text('确定'),
+          FlatButton(
+            child: _isChangingNick
+                ? Padding(
+                    padding: EdgeInsets.all(5),
+                    child: CircularProgressIndicator(),
+                )
+                : Text('确定'),
             onPressed: () {
-              Navigator.of(context).pop();
+              tryChangeNick();
             },
           ),
           FlatButton(
