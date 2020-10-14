@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
+import 'package:cat_gallery/update.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -65,6 +67,25 @@ void showSnackBar(BuildContext context, String content){
       SnackBar(
         content: Text(content),
       )
+  );
+}
+
+Future<void> checkVersion(BuildContext context) async {
+  await Request().go(
+      'get',
+      Strs.publicGetVersion,
+      success: (data){
+        Map<String, dynamic> jsonData = json.decode(data);
+        int version = int.parse(jsonData['version']);
+        print(version > Strs.versionCode);
+        if(version > Strs.versionCode)AppRoute(
+            UpdatePage(
+              version: version,
+              android: jsonData['android'],
+              ios: jsonData['ios'],
+            )
+        ).go(context);
+      }
   );
 }
 

@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
+import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/custom_image.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:flutter/material.dart';
@@ -28,16 +30,19 @@ class _HomePageState extends State<HomePage>
   AnimationController _controller;
   CurvedAnimation _curvedAnimation;
   double _scale;
-  CatStore catStore = CatStore();
-  bool isBusy = true;
+  CatStore catStore = locator<CatStore>();
+  bool isBusy;
   Map<String, dynamic> catData;
 
   Future<void> initData() async {
-    await catStore.init();
+    isBusy = true;
+
     catData = json.decode(catStore.allCats.fetch());
     final nekoList = catData['neko_list'];
+
     _index = nekoList.length - 1;
     _fixedExtentScrollController = FixedExtentScrollController(initialItem: _index);
+
     nekoList.forEach((cat){
       Map<String, dynamic> catJson = json.decode(catStore.fetch(cat[Strs.keyCatId]));
       List<String> imgs = [];
@@ -57,12 +62,14 @@ class _HomePageState extends State<HomePage>
     setState(() {
       isBusy = false;
     });
+    checkVersion(context);
   }
 
   @override
   void initState() {
     super.initState();
     initData();
+
     _controller = AnimationController(
       vsync: this,
       lowerBound: 0.0,
@@ -73,6 +80,7 @@ class _HomePageState extends State<HomePage>
         parent: _controller,
         curve: Curves.easeInOutCubic
     )..addListener(() { setState(() {});});
+
     Future.delayed(
         Duration(milliseconds: 477), () =>
         _fixedExtentScrollController.animateToItem(0,

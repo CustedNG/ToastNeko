@@ -3,6 +3,7 @@ import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/utils.dart';
+import 'package:cat_gallery/widget/round_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widget/round_shape.dart';
@@ -130,8 +131,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
         ),
         SizedBox(height: 40),
         !user.loggedIn
-            ? _logInOutBtn(context, '登录', Colors.redAccent, () => AppRoute(LoginPage()).go(context))
-            : _logInOutBtn(context, '退出登录', Colors.redAccent, () => user.logout())
+            ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context)).build(context)
+            : RoundBtn('退出登录', Colors.redAccent, () => user.logout()).build(context)
         ,
         SizedBox(height: 40.0)
       ],
@@ -160,23 +161,6 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
           },
         ),
       ],
-    );
-  }
-
-  Widget _logInOutBtn(BuildContext context, String btnName, Color color,
-      GestureTapCallback onTap) {
-    return Container(
-      height: 35.0,
-      child: Material(
-        elevation: 10.0,
-        color: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(40.0)),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: MaterialButton(
-            child: Text(btnName), textColor: Colors.white, onPressed: onTap),
-      ),
     );
   }
 }

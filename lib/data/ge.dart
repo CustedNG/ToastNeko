@@ -1,4 +1,7 @@
 class Strs{
+  //version
+  static const int versionCode = 4;
+
   //url
   static const String baseUrl = 'https://neko.lacus.site';
   static const String apiVersion = '1';

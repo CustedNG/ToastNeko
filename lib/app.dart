@@ -76,8 +76,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: BouncingScrollPhysics(),
         controller: _pageController,
+        onPageChanged: (index) => setState(() => _selectIndex = index),
         children: [
           HomePage(),
           InfoPage()
