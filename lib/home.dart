@@ -55,6 +55,8 @@ class _HomePageState extends State<HomePage>
               catJson[Strs.keyCatSex],
               catJson[Strs.keyCatDescription],
               catJson[Strs.keyCatAvatar],
+              catJson[Strs.keyCatCourage],
+              catJson[Strs.keyCatAppearRate],
               imgs
           )
       );
