@@ -59,6 +59,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
   Widget _buildCard(int index){
     bool isNotLast = index != widget.cat.img.length;
     String url = Strs.baseImgUrl + widget.cat.img[isNotLast ? index : 0];
+    bool haveComment = _comments.length != 0;
 
     return GestureDetector(
       onTap: () => isNotLast ? AppRoute(
@@ -66,6 +67,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
             url: url,
             index: index,
             cat: widget.cat,
+            commentData: haveComment ? _comments[0].content : '暂无评论',
           )
       ).go(context) : null,
       child: Card(

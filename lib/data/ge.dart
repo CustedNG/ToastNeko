@@ -64,6 +64,7 @@ class Strs{
   static const String joinQQUrl = 'https://jq.qq.com/?_wv=1027&k=86nHLzAl';
   static const String photoWrongSolution = '如果图片显示错误，请清除所有数据。';
   static const String helpText1 = '首页上下滑动，点击查看图片。';
+  static const String loginToast = '账户密码为教务账户与密码\n我们不搜集信息\n登录仅供验证是否为理工学生';
 
   //asset
   static const String custMapW = 'assets/map/CustW.png';

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/update.dart';
@@ -25,20 +26,12 @@ Future<void> initCatData([String nekoId]) async {
   Map<String, dynamic> jsonData;
   final catStore = CatStore();
   await catStore.init();
-  
+
   if(nekoId != null){
-    await Request().go(
-        'get',
-        Strs.publicGetCatDetail,
-        data: {'neko_id': nekoId},
-        success: (value) async {
-          jsonData = json.decode(value);
-          catStore.put(nekoId, json.encode(jsonData));
-        },
-        failed: (code) => print(code)
-    );
+    initSpecificCatData(nekoId, catStore);
     return;
   }
+
   List<String> catId = [];
   await Request().go(
       'get',
@@ -51,17 +44,20 @@ Future<void> initCatData([String nekoId]) async {
       failed: (code) => print(code)
   );
   for(String id in catId){
-    await Request().go(
-        'get',
-        Strs.publicGetCatDetail,
-        data: {'neko_id': id},
-        success: (value) async {
-          jsonData = json.decode(value);
-          catStore.put(id, json.encode(jsonData));
-        },
-        failed: (code) => print(code)
-    );
+    initSpecificCatData(id, catStore);
   }
+}
+
+Future<void> initSpecificCatData(String nekoId, CatStore catStore) async {
+  await Request().go(
+      'get',
+      Strs.publicGetCatDetail,
+      data: {'neko_id': nekoId},
+      success: (value) async {
+        catStore.put(nekoId, value);
+      },
+      failed: (code) => print(code)
+  );
 }
 
 void showSnackBar(BuildContext context, String content){
@@ -121,6 +117,22 @@ void showRoundDialog(BuildContext context, String title, Widget child, List<Widg
           actions: actions,
         );
       }
+  );
+}
+
+void showShouldLoginDialog(BuildContext context){
+  showRoundDialog(
+      context, '提示', Text('需要先登录才能继续'),
+      [
+        FlatButton(
+            onPressed: () => AppRoute(LoginPage()).go(context),
+            child: Text('好')
+        ),
+        FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('取消')
+        )
+      ]
   );
 }
 

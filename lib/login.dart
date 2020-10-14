@@ -35,8 +35,8 @@ class _LoginPageState extends State<LoginPage> {
           'post',
           Strs.userLogin,
           data: {
-            'cid': username,
-            'pwd': password
+            Strs.keyUserAccount: username,
+            Strs.keyUserPwd: password
           },
           success: (body){
             _userStore.username.put(username);
@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
     autoFillText();
     Future.delayed(Duration(microseconds: 377), () => showToast(
         context,
-        '账户密码为教务账户与密码\n我们不搜集信息\n登录仅供验证是否为理工学生',
+        Strs.loginToast,
         true
     ));
   }
@@ -103,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
               TextField(
                 controller: _usernameController,
                 keyboardType: TextInputType.number,
+                maxLength: 10,
                 style: TextStyle(color: Colors.white),
                 decoration: buildDecoration('一卡通号'),
                 onSubmitted: (_) => focusOnPasswordField(),

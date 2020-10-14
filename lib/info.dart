@@ -211,6 +211,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
             TextField(
               controller: _nickController,
               focusNode: _nickFocusNode,
+              maxLength: 12,
               style: TextStyle(color: Colors.white),
               decoration: buildDecoration('想要的新昵称'),
             )

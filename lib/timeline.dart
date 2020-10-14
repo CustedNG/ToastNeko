@@ -148,7 +148,7 @@ class _TimelinePageState extends State<TimelinePage> {
           }
         },
         success: (body) async {
-          await initCatData(widget.catId);
+          await initSpecificCatData(widget.catId, _catStore);
           setState(() {
             initData();
             _textFieldController.clear();
@@ -173,10 +173,12 @@ class _TimelinePageState extends State<TimelinePage> {
           children: [
             isLogin ? TextField(
               controller: _textFieldController,
+              maxLength: 10,
               decoration: buildDecoration('$catName在哪里'),
             ) : Text('需要登录才可以反馈$catName的行踪'),
             isLogin ? TextField(
               controller: _textFieldController2,
+              maxLength: 10,
               decoration: buildDecoration('$catName在干什么'),
             ) : Container(),
           ],

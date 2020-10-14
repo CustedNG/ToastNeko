@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:cat_gallery/core/provider.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/store/cat_store.dart';
-import 'package:cat_gallery/utils.dart';
 
 class CatProvider extends BusyProvider {
   var _catJson;
   dynamic get catJson => _catJson;
+
+  Map<String, String> _catDataMap;
+  Map<String, String> get catDataMap => _catDataMap;
 
   final _initialized = Completer();
   Future get initialized => _initialized.future;
@@ -20,20 +22,16 @@ class CatProvider extends BusyProvider {
     _initialized.complete(null);
   }
 
-  Future<void> put(var data) async {
+  Future<void> put(String nekoId, String data) async {
     await busyRun(() async {
-      await _setData(data);
+      final catData = await locator.getAsync<CatStore>();
+      catData.put(nekoId, data);
     });
   }
 
-  Future<void> fetch(var data) async {
-    unawaited(_setData(data));
-    notifyListeners();
-  }
-
-  Future<void> _setData(var data) async {
-    _catJson = data;
+  Future<void> fetch(String nekoId) async {
     final catData = await locator.getAsync<CatStore>();
-    unawaited(catData.allCats.put(data));
+    catData.fetch(nekoId);
+    notifyListeners();
   }
 }
