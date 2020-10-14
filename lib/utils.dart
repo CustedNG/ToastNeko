@@ -5,7 +5,9 @@ import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/update.dart';
+import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 bool isDarkMode(BuildContext context) =>
@@ -90,3 +92,49 @@ Future<void> checkVersion(BuildContext context) async {
 }
 
 void unawaited(Future<void> future) {}
+
+void showToast(BuildContext context, String content, bool isLong) =>
+  Toast.show(
+      content,
+      context,
+      duration: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
+      gravity: Toast.BOTTOM);
+
+bool isInputNotRubbish(List<TextEditingController> controllers){
+  for(var controller in controllers){
+    if(controller.text.length < 2 || controller.text.length > 10)return false;
+  }
+  return true;
+}
+
+void showRoundDialog(BuildContext context, String title, Widget child, List<Widget> actions){
+  showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(title),
+          shape: RoundShape().build(),
+          content: child,
+          actions: actions,
+        );
+      }
+  );
+}
+
+void showWrongDialog(BuildContext context, String wrongMsg){
+  showDialog(
+      context: context,
+      builder: (ctx){
+        return AlertDialog(
+          shape: RoundShape().build(),
+          content: Text(wrongMsg),
+          actions: [
+            FlatButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('确定')
+            )
+          ],
+        );
+      }
+  );
+}

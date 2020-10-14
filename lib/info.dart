@@ -3,6 +3,7 @@ import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/utils.dart';
+import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:cat_gallery/widget/round_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,10 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
   AnimationController _controller;
   CurvedAnimation _curvedAnimation;
   double _scale;
-  UserProvider user;
+  UserProvider _user;
+
+  final _nickController = TextEditingController();
+  final _nickFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -43,10 +47,10 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
-    user = Provider.of<UserProvider>(context);
+    _user = Provider.of<UserProvider>(context);
     _scale = 1 - _curvedAnimation.value;
 
-    if(user.isBusy)return CircularProgressIndicator();
+    if(_user.isBusy)return CircularProgressIndicator();
 
     return Scaffold(
       appBar: AppBar(
@@ -125,42 +129,83 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
         SettingItem(title: Strs.joinUserGroup, onTap: () => launchURL(Strs.joinQQUrl)),
         SizedBox(height: 20.0),
         SettingItem(title: Strs.usageHelp, onTap: () =>
-            showDialog(context: context, builder: (ctx){
-              return _buildAlertDialog(context);
-            })
+            showRoundDialog(
+                context,
+                '帮助',
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(Strs.photoWrongSolution),
+                    Text(Strs.helpText1)
+                  ],
+                ),
+                [
+                  FlatButton(
+                    child: Text('确定'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ]
+            )
         ),
         SizedBox(height: 40),
-        !user.loggedIn
-            ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context)).build(context)
-            : RoundBtn('退出登录', Colors.redAccent, () => user.logout()).build(context)
-        ,
+        Row(
+            mainAxisAlignment: _user.loggedIn
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.center,
+            children: [
+              !_user.loggedIn
+                  ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context)).build(context)
+                  : RoundBtn('退出登录', Colors.redAccent, () => _user.logout()).build(context),
+              _user.loggedIn
+                  ? RoundBtn('修改昵称', Colors.cyan, () => _buildNickDialog(context))
+                  : Container(),
+            ]
+        ),
         SizedBox(height: 40.0)
       ],
     );
   }
 
-  Widget _buildAlertDialog(BuildContext context){
-    return AlertDialog(
-      shape: RoundShape().build(),
-      content: SizedBox(
-        height: 77,
-        child: Column(
+  void tryChangeNick(){
+    if(!isInputNotRubbish([_nickController]))return;
+  }
+
+  void _buildNickDialog(BuildContext context) {
+    showRoundDialog(
+        context,
+        '修改昵称',
+        Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text(Strs.photoWrongSolution),
-            Text(Strs.helpText1)
+            TextField(
+              controller: _nickController,
+              focusNode: _nickFocusNode,
+              style: TextStyle(color: Colors.white),
+              obscureText: true,
+              decoration: buildDecoration('想要的新昵称'),
+              onSubmitted: (_) => tryChangeNick(),
+            )
           ],
         ),
-      ),
-      actions: <Widget>[
-        FlatButton(
-          child: Text('确定'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
+        [
+          FlatButton(child: Text('确定'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+              onPressed: (){
+                Navigator.of(context).pop();
+              },
+              child: Text('取消')
+          )
+        ]
     );
   }
 }

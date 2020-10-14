@@ -13,8 +13,8 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  var commentData;
-  bool isBusy = true;
+  var _commentData;
+  bool _isBusy = true;
 
   @override
   void initState() {
@@ -25,8 +25,8 @@ class _ChatPageState extends State<ChatPage> {
   void initData() async{
     final catStore = CatStore();
     await catStore.init();
-    commentData = json.decode(catStore.fetch(widget.catId))['comment'];
-    isBusy = false;
+    _commentData = json.decode(catStore.fetch(widget.catId))['comment'];
+    _isBusy = false;
     setState(() {
     });
   }
@@ -45,7 +45,7 @@ class _ChatPageState extends State<ChatPage> {
           child: Padding(
             padding: EdgeInsets.only(top: 20),
             child: Center(
-              child: isBusy ? CircularProgressIndicator() : _buildList(context),
+              child: _isBusy ? CircularProgressIndicator() : _buildList(context),
             ),
           )
       ),
@@ -54,7 +54,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildList(BuildContext context){
     return ListView.builder(
-        itemCount: commentData.length,
+        itemCount: _commentData.length,
         itemBuilder: (context, index){
           return Container();
         }

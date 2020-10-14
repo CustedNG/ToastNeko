@@ -10,7 +10,7 @@ import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
-import 'package:cat_gallery/widget/round_shape.dart';
+import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -27,16 +27,16 @@ class TimelinePage extends StatefulWidget {
 
 class _TimelinePageState extends State<TimelinePage> {
   List<Step> _steps;
-  bool isBusy;
-  bool isUploading = false;
+  bool _isBusy;
+  bool _isUploading = false;
 
-  final textFieldController = TextEditingController();
-  final textFieldController2 = TextEditingController();
-  final userStore = locator<UserStore>();
-  UserProvider user;
-  final catStore = locator<CatStore>();
+  final _textFieldController = TextEditingController();
+  final _textFieldController2 = TextEditingController();
+  final _userStore = locator<UserStore>();
+  UserProvider _user;
+  final _catStore = locator<CatStore>();
 
-  List<Color> colorList = [
+  static const List<Color> colorList = [
     Colors.cyan,
     Colors.pinkAccent,
     Colors.yellow,
@@ -46,7 +46,7 @@ class _TimelinePageState extends State<TimelinePage> {
     Colors.brown,
     Colors.indigo
   ];
-  List<IconData> iconList = [
+  static const List<IconData> iconList = [
     Icons.architecture,
     Icons.search,
     Icons.flag,
@@ -57,7 +57,7 @@ class _TimelinePageState extends State<TimelinePage> {
 
   @override
   void initState() {
-    isBusy = true;
+    _isBusy = true;
     initData();
     super.initState();
   }
@@ -65,12 +65,12 @@ class _TimelinePageState extends State<TimelinePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    user = Provider.of<UserProvider>(context);
+    _user = Provider.of<UserProvider>(context);
   }
 
   void initData() async{
     _steps = [];
-    Map<String, dynamic> jsonData = json.decode(catStore.fetch(widget.catId));
+    Map<String, dynamic> jsonData = json.decode(_catStore.fetch(widget.catId));
     final positions = jsonData[Strs.keyCatPosition];
     for(Map<String, dynamic> position in positions){
       if(_steps.isEmpty)_steps.add(
@@ -92,22 +92,16 @@ class _TimelinePageState extends State<TimelinePage> {
           Step(
               type: Type.line,
               duration: position['duration'],
-              message: //position['nick'] + '发现' +
+              message: (position['nick'] ?? '') + ' 发现 ' +
                    widget.catName +
-                  '在' + position['msg'],
+                  ' 在' + position['msg'],
               color: colorList[Random().nextInt(7)],
           )
       );
     }
     setState(() {
-      isBusy = false;
+      _isBusy = false;
     });
-  }
-
-  InputDecoration _buildDecoration(String label){
-    return InputDecoration(
-        labelText: label,
-    );
   }
 
   String nowDIYTime(){
@@ -115,51 +109,26 @@ class _TimelinePageState extends State<TimelinePage> {
     return '${dateTime.year}-${dateTime.month}-${dateTime.day} '
         '${dateTime.hour}:${dateTime.minute}';
   }
-
-  bool isInputNotRubbish(List<TextEditingController> controllers){
-    for(var controller in controllers){
-      if(controller.text.length < 2 || controller.text.length > 10)return false;
-    }
-    return true;
-  }
-
-  void showWrongDialog(String wrongMsg){
-    showDialog(
-        context: context,
-        builder: (ctx){
-          return AlertDialog(
-            shape: RoundShape().build(),
-            content: Text(wrongMsg),
-            actions: [
-              FlatButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('确定')
-              )
-            ],
-          );
-        }
-    );
-  }
   
   void tryUpload() async{
-    if(isUploading)return;
-    isUploading = true;
+    if(_isUploading)return;
+    _isUploading = true;
     setState(() {});
-    final lastTime = userStore.lastCommentTime.fetch();
+    final lastTime = _userStore.lastCommentTime.fetch();
     final nowTime = DateTime.now();
-    final textValue1 = textFieldController.value.text;
-    final textValue2 = textFieldController2.value.text;
+    final textValue1 = _textFieldController.value.text;
+    final textValue2 = _textFieldController2.value.text;
 
-    if(!isInputNotRubbish([textFieldController, textFieldController2])){
-      showWrongDialog('每项输入不得小于2大于10');
-      isUploading = false;
+    if(!isInputNotRubbish([_textFieldController, _textFieldController2])){
+      showWrongDialog(context, '每项输入不得小于2大于10');
+      _isUploading = false;
       return;
     }
 
     if(lastTime != null){
       if(nowTime.difference(DateTime.parse(lastTime)).inMinutes < 10){
-        showWrongDialog('每次上报间隔不小于十分钟');
-        isUploading = false;
+        showWrongDialog(context, '每次上报间隔不小于十分钟');
+        _isUploading = false;
         return;
       }
     }
@@ -173,24 +142,66 @@ class _TimelinePageState extends State<TimelinePage> {
             'location': textValue1,
             'time': nowDIYTime(),
             'duration': 0,
-            'nick': userStore.nick.fetch(),
+            'nick': _userStore.nick.fetch(),
             'msg': textValue2,
-            'open_id': userStore.openId.fetch()
+            'open_id': _userStore.openId.fetch()
           }
         },
         success: (body) async {
           await initCatData(widget.catId);
           setState(() {
             initData();
-            textFieldController.clear();
-            textFieldController2.clear();
-            userStore.lastCommentTime.put(nowTime.toString());
+            _textFieldController.clear();
+            _textFieldController2.clear();
+            _userStore.lastCommentTime.put(nowTime.toString());
             Navigator.of(context).pop();
           });
         },
         failed: (code) => print(code)
     );
-    isUploading = false;
+    _isUploading = false;
+  }
+
+  void _showAddDialog(){
+    final catName = widget.catName;
+    bool isLogin = _user.loggedIn;
+    showRoundDialog(
+        context,
+        isLogin ? '我发现了$catName': '是否登录？',
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            isLogin ? TextField(
+              controller: _textFieldController,
+              decoration: buildDecoration('$catName在哪里'),
+            ) : Text('需要登录才可以反馈$catName的行踪'),
+            isLogin ? TextField(
+              controller: _textFieldController2,
+              decoration: buildDecoration('$catName在干什么'),
+            ) : Container(),
+          ],
+        ),
+        [
+          FlatButton(
+              onPressed: (){
+                if(isLogin){
+                  tryUpload();
+                  return;
+                }
+                AppRoute(LoginPage()).go(context);
+              },
+              child: _isUploading
+                  ? CircularProgressIndicator()
+                  : Text(isLogin? '提交${widget.catName}行踪' : '登录')
+          ),
+          FlatButton(
+              onPressed: (){
+                Navigator.of(context).pop();
+              },
+              child: Text('取消')
+          )
+        ]
+    );
   }
 
   @override
@@ -205,50 +216,14 @@ class _TimelinePageState extends State<TimelinePage> {
           accentColor: Colors.white.withOpacity(0.2),
         ),
         child: Center(
-          child: isBusy
+          child: _isBusy
               ? CircularProgressIndicator()
               : _TimelineActivity(steps: _steps),
         )
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final catName = widget.catName;
-          bool isLogin = user.loggedIn;
-          showDialog(
-            context: context,
-            builder: (ctx){
-              return AlertDialog(
-                shape: RoundShape().build(),
-                title: Text(isLogin ? '我发现了$catName': '是否登录？'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    isLogin ? TextField(
-                      controller: textFieldController,
-                      decoration: _buildDecoration('$catName在哪里'),
-                    ) : Text('需要登录才可以反馈$catName的行踪'),
-                    isLogin ? TextField(
-                      controller: textFieldController2,
-                      decoration: _buildDecoration('$catName在干什么'),
-                    ) : Container(),
-                  ],
-                ),
-                actions: [
-                  FlatButton(
-                      onPressed: (){
-                        isLogin
-                            ? tryUpload()
-                            : AppRoute(LoginPage()).go(context);
-                        setState(() {});
-                      },
-                      child: isUploading
-                          ? CircularProgressIndicator()
-                          : Text(isLogin? '提交${widget.catName}行踪' : '登录')
-                  )
-                ],
-              );
-            }
-          );
+          _showAddDialog();
         },
         child: Icon(Icons.remove_red_eye),
       ),

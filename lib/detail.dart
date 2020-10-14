@@ -105,6 +105,7 @@ class _MyDetailPageState extends State<MyDetailPage> with AutomaticKeepAliveClie
         ringWidth: 77,
         ringDiameter: 277,
         ringColor: isDarkMode(context) ? Colors.black87 : Colors.white70,
+        animationCurve: Curves.easeInOutCubic,
         children: [
           IconButton(
               icon: Icon(Icons.map),

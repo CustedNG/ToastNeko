@@ -23,9 +23,6 @@ class PhotoPage extends StatelessWidget{
             ),
           ),
           onTap: () => Navigator.pop(context),
-          onVerticalDragUpdate: (detail) {
-            if(detail.delta.dy > 13)Navigator.of(context).pop();
-          },
         )
     );
   }

@@ -5,6 +5,8 @@ import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/store/user_store.dart';
+import 'package:cat_gallery/utils.dart';
+import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,19 +16,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  final passwordFocusNode = FocusNode();
-  bool isBusy = false;
-  final userStore = locator<UserStore>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _passwordFocusNode = FocusNode();
+  bool _isBusy = false;
+  final _userStore = locator<UserStore>();
 
   Future<void> tryLogin() async {
-    if (isBusy) return;
+    if (_isBusy) return;
 
-    setState(() => isBusy = true);
+    setState(() => _isBusy = true);
 
-    final username = usernameController.value.text;
-    final password = passwordController.value.text;
+    final username = _usernameController.value.text;
+    final password = _passwordController.value.text;
 
     try {
       await Request().go(
@@ -37,11 +39,12 @@ class _LoginPageState extends State<LoginPage> {
             'pwd': password
           },
           success: (body){
-            userStore.username.put(username);
-            userStore.password.put(password);
+            _userStore.username.put(username);
+            _userStore.password.put(password);
             Provider.of<UserProvider>(context).login();
             Map<String, dynamic> jsonData = json.decode(body);
-            userStore.openId.put(jsonData[Strs.keyUserId]);
+            _userStore.openId.put(jsonData[Strs.keyUserId]);
+            _userStore.nick.put(jsonData[Strs.keyUserName]);
             Navigator.of(context).pop();
           },
           failed: (code) => print(code)
@@ -49,23 +52,28 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       rethrow;
     } finally {
-      setState(() => isBusy = false);
+      setState(() => _isBusy = false);
     }
   }
 
   void focusOnPasswordField() {
-    FocusScope.of(context).requestFocus(passwordFocusNode);
+    FocusScope.of(context).requestFocus(_passwordFocusNode);
   }
 
   void autoFillText(){
-    usernameController.text = userStore.username.fetch();
-    passwordController.text = userStore.password.fetch();
+    _usernameController.text = _userStore.username.fetch();
+    _passwordController.text = _userStore.password.fetch();
   }
 
   @override
   void initState() {
     super.initState();
     autoFillText();
+    Future.delayed(Duration(microseconds: 377), () => showToast(
+        context,
+        '账户密码为教务账户与密码\n我们不搜集信息\n登录仅供验证是否为理工学生',
+        true
+    ));
   }
 
   @override
@@ -73,19 +81,6 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: _buildLoginForm(context),
       backgroundColor: Colors.teal,
-    );
-  }
-
-  InputDecoration _buildDecoration(String label, TextStyle textStyle){
-    return InputDecoration(
-        labelText: label,
-        labelStyle: textStyle,
-        border: OutlineInputBorder(),
-        enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: Colors.lightBlueAccent
-            )
-        )
     );
   }
 
@@ -106,19 +101,19 @@ class _LoginPageState extends State<LoginPage> {
               _title(),
               SizedBox(height: 77),
               TextField(
-                controller: usernameController,
+                controller: _usernameController,
                 keyboardType: TextInputType.number,
                 style: TextStyle(color: Colors.white),
-                decoration: _buildDecoration('一卡通号', TextStyle(color: Color(0x55FFFFFF))),
+                decoration: buildDecoration('一卡通号'),
                 onSubmitted: (_) => focusOnPasswordField(),
               ),
               SizedBox(height: 15),
               TextField(
-                controller: passwordController,
-                focusNode: passwordFocusNode,
+                controller: _passwordController,
+                focusNode: _passwordFocusNode,
                 style: TextStyle(color: Colors.white),
                 obscureText: true,
-                decoration: _buildDecoration('统一认证密码', TextStyle(color: Color(0x55FFFFFF))),
+                decoration: buildDecoration('统一认证密码'),
                 onSubmitted: (_) => tryLogin(),
               ),
               SizedBox(height: 90),
@@ -139,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Material(
                         borderRadius: BorderRadius.all(Radius.circular(100)),
                         child: Center(
-                          child: isBusy
+                          child: _isBusy
                               ? CircularProgressIndicator()
                               : Icon(Icons.arrow_forward, color: Colors.white),
                         ),
