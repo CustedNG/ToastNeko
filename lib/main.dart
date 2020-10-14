@@ -14,6 +14,7 @@ Future<void> init() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocDir.path);
   await setupLocator(appDocDir.path);
+  await initCatData();
   locator<UserProvider>().loadLocalData();
   locator<CatProvider>().loadLocalData();
 }
@@ -30,5 +31,4 @@ void main() async {
         child: MyApp(),
       )
   );
-  initCatData();
 }

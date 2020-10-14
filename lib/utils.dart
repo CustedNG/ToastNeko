@@ -26,26 +26,15 @@ Future<void> initCatData([String nekoId]) async {
   Map<String, dynamic> jsonData;
   final catStore = CatStore();
   await catStore.init();
-
-  if(nekoId != null){
-    initSpecificCatData(nekoId, catStore);
-    return;
-  }
-
-  List<String> catId = [];
   await Request().go(
       'get',
       Strs.publicGetAllCats,
       success: (value) async {
         jsonData = json.decode(value);
-        jsonData['neko_list'].forEach((cat) => catId.add(cat['neko_id']));
         catStore.allCats.put(json.encode(jsonData));
       },
       failed: (code) => print(code)
   );
-  for(String id in catId){
-    initSpecificCatData(id, catStore);
-  }
 }
 
 Future<void> initSpecificCatData(String nekoId, CatStore catStore) async {

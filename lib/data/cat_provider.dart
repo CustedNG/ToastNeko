@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cat_gallery/core/provider.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/store/cat_store.dart';
+import 'package:cat_gallery/utils.dart';
 
 class CatProvider extends BusyProvider {
   var _catJson;
@@ -17,6 +19,11 @@ class CatProvider extends BusyProvider {
   Future<void> loadLocalData() async {
     final catData = await locator.getAsync<CatStore>();
     _catJson = catData.allCats.fetch();
+    final jsonData = json.decode(_catJson);
+    jsonData['neko_list'].forEach((cat) async {
+      final _catId = cat['neko_id'];
+      initSpecificCatData(_catId, catData);
+    });
     notifyListeners();
 
     _initialized.complete(null);
