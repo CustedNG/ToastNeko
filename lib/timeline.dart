@@ -103,12 +103,6 @@ class _TimelinePageState extends State<TimelinePage> {
       _isBusy = false;
     });
   }
-
-  String nowDIYTime(){
-    final dateTime = DateTime.now();
-    return '${dateTime.year}-${dateTime.month}-${dateTime.day} '
-        '${dateTime.hour}:${dateTime.minute}';
-  }
   
   void tryUpload() async{
     if(_isUploading)return;

@@ -48,6 +48,7 @@ class Strs{
   static const String keyUserImg = 'avatar';
   static const String keyCommentID = 'comment_id';
   static const String keyCommentContent = 'content';
+  static const String keyCommentPosition = 'position';
   static const String keyReply = 'reply';
   static const String keyReplyId = 'reply_id';
   static const String keyCreateTime = 'create_time';

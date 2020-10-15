@@ -142,3 +142,9 @@ void showWrongDialog(BuildContext context, String wrongMsg){
       }
   );
 }
+
+String nowDIYTime(){
+  final dateTime = DateTime.now();
+  return '${dateTime.year}-${dateTime.month}-${dateTime.day} '
+      '${dateTime.hour}:${dateTime.minute}';
+}
