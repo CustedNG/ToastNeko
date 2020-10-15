@@ -77,15 +77,15 @@ class _TimelinePageState extends State<TimelinePage> {
           Step(
             type: Type.line,
             duration: position['duration'],
-            color: colorList[Random().nextInt(7)],
+            color: colorList[Random().nextInt(8)],
           )
       );
       _steps.add(
           Step(
             type: Type.checkpoint,
             message: position['time'],
-            color: colorList[Random().nextInt(7)],
-            icon: iconList[Random().nextInt(5)]
+            color: colorList[Random().nextInt(8)],
+            icon: iconList[Random().nextInt(6)]
           )
       );
       _steps.add(
@@ -95,7 +95,7 @@ class _TimelinePageState extends State<TimelinePage> {
               message: (position['nick'] ?? '') + ' 发现 ' +
                    widget.catName +
                   ' 在' + position['msg'],
-              color: colorList[Random().nextInt(7)],
+              color: colorList[Random().nextInt(8)],
           )
       );
     }

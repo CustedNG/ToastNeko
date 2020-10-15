@@ -5,6 +5,7 @@ import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/model/cat.dart';
+import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class PhotoPage extends StatelessWidget{
   final String url;
   final int index;
   final Cat cat;
-  final String commentData;
+  final List<Comment> commentData;
 
   PhotoPage({Key key, this.url, this.index, this.cat, this.commentData}) : super(key: key);
 
@@ -28,6 +29,9 @@ class PhotoPage extends StatelessWidget{
         children: [
           GestureDetector(
             child: PhotoView(
+              backgroundDecoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor
+              ),
               maxScale: 3.0,
               minScale: PhotoViewComputedScale.contained,
               imageProvider: CachedNetworkImageProvider(url),
@@ -41,36 +45,41 @@ class PhotoPage extends StatelessWidget{
             },
           ),
           Positioned(
-            child: SafeArea(
-              child: BlurryContainer(
-                blur: 10,
-                bgColor: Colors.tealAccent,
-                height: size.height * 0.2,
-                width: size.width,
-                borderRadius: BorderRadius.zero,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(commentData),
-                    TextField(
-                      onSubmitted: (str) => tryComment(context, str),
-                      maxLength: 20,
-                      maxLines: 2,
-                      minLines: 1,
-                      decoration: buildRoundDecoration(
-                          '想说点什么？',
-                          Icon(Icons.chat)
-                      ),
-                    )
-                  ],
-                ),
-              ),
+              top: 10,
+              left: 10,
+              child: SafeArea(
+                child: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop()
+                )
+              )
+          ),
+          Positioned(
+            child: BlurryContainer(
+              width: size.width,
+              height: 97,
+              blur: 10,
+              borderRadius: BorderRadius.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    onSubmitted: (str) => tryComment(context, str),
+                    textInputAction: TextInputAction.go,
+                    maxLines: 2,
+                    minLines: 1,
+                    decoration: buildRoundDecoration(
+                        '想说点什么？',
+                        Icon(Icons.chat)
+                    ),
+                  ),
+                ],
+              )
             ),
             bottom: 0,
           )
         ],
-      ),
+      )
     );
   }
   
@@ -79,18 +88,19 @@ class PhotoPage extends StatelessWidget{
       showShouldLoginDialog(context);
       return;
     }
+
     final _user = Provider.of<UserProvider>(context);
     await Request().go(
       'post',
       Strs.userComment,
       data: {
-        Strs.keyComment: {
+        Strs.keyCommentContent: {
           Strs.keyUserInfo: {
             Strs.keyUserId: _user.openId,
-            Strs.keyUserName: _user.nick
           },
           Strs.keyCommentContent: str,
-          Strs.keyCreateTime: nowDIYTime()
+          Strs.keyCreateTime: nowDIYTime(),
+          Strs.keyFileName : cat.img[index]
         },
         Strs.keyCommentPosition: {
           "is_comment": true,
@@ -101,7 +111,7 @@ class PhotoPage extends StatelessWidget{
         showToast(context, '评论成功', false);
         Provider.of<CatProvider>(context).loadLocalData();
       },
-      failed: (code) => print(code)
+      failed: (code) => showWrongToast(context, code)
     );
   }
 }

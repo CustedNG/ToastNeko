@@ -87,6 +87,9 @@ void showToast(BuildContext context, String content, bool isLong) =>
       duration: isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
       gravity: Toast.BOTTOM);
 
+void showWrongToast(BuildContext context, String msg) =>
+  showToast(context, msg, true);
+
 bool isInputNotRubbish(List<TextEditingController> controllers, [int max, int min]){
   for(var controller in controllers){
     if(controller.text.length < (min ?? 2) || controller.text.length > (max ?? 10))

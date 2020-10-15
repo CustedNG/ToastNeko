@@ -10,23 +10,17 @@ class CatProvider extends BusyProvider {
   var _catJson;
   dynamic get catJson => _catJson;
 
-  Map<String, String> _catDataMap;
-  Map<String, String> get catDataMap => _catDataMap;
-
-  final _initialized = Completer();
-  Future get initialized => _initialized.future;
-
   Future<void> loadLocalData() async {
     final catData = await locator.getAsync<CatStore>();
     _catJson = catData.allCats.fetch();
+
     final jsonData = json.decode(_catJson);
     jsonData['neko_list'].forEach((cat) async {
-      final _catId = cat['neko_id'];
-      initSpecificCatData(_catId, catData);
+      final catId = cat['neko_id'];
+      initSpecificCatData(catId, catData);
     });
-    notifyListeners();
 
-    _initialized.complete(null);
+    notifyListeners();
   }
 
   Future<void> put(String nekoId, String data) async {
@@ -36,9 +30,9 @@ class CatProvider extends BusyProvider {
     });
   }
 
-  Future<void> fetch(String nekoId) async {
+  Future<String> fetch(String nekoId) async {
     final catData = await locator.getAsync<CatStore>();
-    catData.fetch(nekoId);
     notifyListeners();
+    return catData.fetch(nekoId);
   }
 }

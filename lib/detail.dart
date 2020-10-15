@@ -1,15 +1,16 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/discuss.dart';
 import 'package:cat_gallery/intro.dart';
-import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/photo.dart';
 import 'package:cat_gallery/position.dart';
 import 'package:cat_gallery/route.dart';
-import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/timeline.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/custom_image.dart';
@@ -18,6 +19,7 @@ import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:provider/provider.dart';
 
 class DetailPage extends StatefulWidget {
   final Cat cat;
@@ -30,18 +32,21 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMixin{
-  final _catStore = locator<CatStore>();
   List<Comment> _comments = [];
-  int _commentsLen;
+  bool isBusy = false;
 
   @override
   void initState(){
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      initData();
+    });
     super.initState();
-    initData();
   }
 
-  void initData(){
-    final commentsData = json.decode(_catStore.fetch(widget.cat.id))[Strs.keyComment];
+  Future<void> initData() async {
+    final _catStore = Provider.of<CatProvider>(context);
+    final catJson = await _catStore.fetch(widget.cat.id);
+    final commentsData = json.decode(catJson)[Strs.keyComment];
     for(Map<String, dynamic> comment in commentsData){
       _comments.add(
           Comment(
@@ -49,27 +54,37 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
               comment[Strs.keyUserInfo][Strs.keyUserName],
               comment[Strs.keyCommentID],
               comment[Strs.keyUserInfo][Strs.keyUserId],
-              comment[Strs.keyCreateTime]
+              comment[Strs.keyCreateTime],
+              comment[Strs.keyFileName]
           )
       );
     }
-    _commentsLen = _comments.length;
+    setState(() {
+      isBusy = true;
+    });
   }
 
   Widget _buildCard(int index){
-    bool isNotLast = index != widget.cat.img.length;
-    String url = Strs.baseImgUrl + widget.cat.img[isNotLast ? index : 0];
-    bool haveComment = _comments.length != 0;
+    String url = Strs.baseImgUrl + widget.cat.img[index];
+    List<String> _commentsList = [];
+    _comments.forEach((ele) {
+      if(ele.fileName == widget.cat.img[index])
+        _commentsList.add(
+            _comments[_comments.indexOf(ele)].nick
+                + '：\n'
+                + _comments[_comments.indexOf(ele)].content
+        );
+    });
 
-    return GestureDetector(
-      onTap: () => isNotLast ? AppRoute(
+    return isBusy ? GestureDetector(
+      onTap: () => AppRoute(
           PhotoPage(
             url: url,
             index: index,
             cat: widget.cat,
-            commentData: haveComment ? _comments[0].content : '暂无评论',
+            commentData: _comments,
           )
-      ).go(context) : null,
+      ).go(context),
       child: Card(
         color: Colors.transparent,
         elevation: 20.0,
@@ -79,29 +94,30 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
         child: Stack(
           children: <Widget>[
             SizedBox.expand(
-                child: isNotLast ? MyImage(
+                child: MyImage(
                   imgUrl: url,
                   index: index,
-                ) : Center(child: Text('没有了\n(´･ω･`)')),
+                ),
             ),
-            isNotLast ? Positioned(
+            Positioned(
                 bottom: 0,
                 child: BlurryContainer(
-                  height: 47,
-                  width: MediaQuery.of(context).size.width - 60,
+                  padding: EdgeInsets.all(13),
+                  height: 63,
+                  width: MediaQuery.of(context).size.width / 2 - 10,
                   borderRadius: BorderRadius.zero,
                   child: Text(
-                    index < _commentsLen ? _comments[index].content : '暂无评论',
-                    textScaleFactor: 1.0,
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 12),
+                      _commentsList.length != 0
+                          ? _commentsList[Random().nextInt(_commentsList.length)]
+                          : '暂无评论\n${widget.cat.displayName}想要评论',
+                      style: TextStyle(fontSize: 12.0, color: Colors.white),
                   ),
                 )
-            ) : Container(),
+            ),
           ],
         ),
       ),
-    );
+    ) : Center(child: CircularProgressIndicator());
   }
 
   @override
@@ -113,7 +129,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
           StaggeredGridView.countBuilder(
             physics: BouncingScrollPhysics(),
             crossAxisCount: 4,
-            itemCount: widget.cat.img.length + 1,
+            itemCount: widget.cat.img.length,
             itemBuilder: (BuildContext context, int index) => Hero(
                 tag: index == 0 ? widget.cat : index.hashCode,
                 transitionOnUserGestures: true,
@@ -165,6 +181,15 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
               onPressed: () => AppRoute(
                   IntroPage(
                       cat: widget.cat,
+                  )
+              ).go(context)
+          ),
+          IconButton(
+              icon: Icon(Icons.chat),
+              onPressed: () => AppRoute(
+                  ChatPage(
+                    cat: widget.cat,
+                    commentData: _comments,
                   )
               ).go(context)
           ),

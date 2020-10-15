@@ -52,6 +52,7 @@ class Strs{
   static const String keyReply = 'reply';
   static const String keyReplyId = 'reply_id';
   static const String keyCreateTime = 'create_time';
+  static const String keyFileName = 'file_name';
 
   //app
   static const String appName = 'Toast Neko';

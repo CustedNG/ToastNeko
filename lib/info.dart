@@ -58,7 +58,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
-        title: Container(),
+        title: Text('Toast Neko'),
         centerTitle: true,
       ),
       body: _buildScrollView(context)

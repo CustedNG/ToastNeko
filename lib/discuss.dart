@@ -1,19 +1,22 @@
 import 'dart:convert';
 
+import 'package:cat_gallery/model/cat.dart';
+import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/store/cat_store.dart';
+import 'package:expand_widget/expand_widget.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  final catId;
+  final List<Comment> commentData;
+  final Cat cat;
 
-  const ChatPage({Key key, this.catId}) : super(key: key);
+  const ChatPage({Key key, this.commentData, this.cat}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  var _commentData;
   bool _isBusy = true;
 
   @override
@@ -23,9 +26,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void initData() async{
-    final catStore = CatStore();
-    await catStore.init();
-    _commentData = json.decode(catStore.fetch(widget.catId))['comment'];
     _isBusy = false;
     setState(() {
     });
@@ -35,7 +35,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('开发中！！！'),
+        title: Text('${widget.cat.displayName}的粉丝发言'),
         centerTitle: true,
       ),
       body: Theme(
@@ -54,9 +54,11 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildList(BuildContext context){
     return ListView.builder(
-        itemCount: _commentData.length,
+        itemCount: widget.commentData.length,
         itemBuilder: (context, index){
-          return Container();
+          return ExpandChild(
+            child: Text(widget.commentData[index].content),
+          );
         }
     );
   }
