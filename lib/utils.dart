@@ -70,7 +70,7 @@ Future<void> checkVersion(BuildContext context) async {
                 version: version,
                 android: jsonData['android'],
                 ios: jsonData['ios'],
-                info: jsonData['info'],
+                info: jsonData['info'] ?? '',
               )
           ).go(context);
           print('Update version:$version available');

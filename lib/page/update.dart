@@ -21,6 +21,8 @@ class UpdatePage extends StatelessWidget{
       ),
       body: Center(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(info),
             RoundBtn(
