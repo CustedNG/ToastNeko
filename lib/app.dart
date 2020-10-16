@@ -4,7 +4,7 @@ import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/page/home.dart';
-import 'package:cat_gallery/page/info.dart';
+import 'package:cat_gallery/page/setting.dart';
 import 'package:cat_gallery/model/navigation_item.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/round_shape.dart';

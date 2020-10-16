@@ -5,7 +5,7 @@ import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/page/discuss.dart';
-import 'package:cat_gallery/page/intro.dart';
+import 'package:cat_gallery/page/info.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/page/photo.dart';
