@@ -1,15 +1,15 @@
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
-import 'package:cat_gallery/login.dart';
+import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:cat_gallery/widget/round_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'widget/round_shape.dart';
-import 'widget/setting_item.dart';
+import '../widget/round_shape.dart';
+import '../widget/setting_item.dart';
 
 class InfoPage extends StatefulWidget{
   @override

@@ -5,7 +5,7 @@ import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/locator.dart';
-import 'package:cat_gallery/login.dart';
+import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/store/user_store.dart';

@@ -8,8 +8,9 @@ class UpdatePage extends StatelessWidget{
   final version;
   final android;
   final ios;
+  final info;
 
-  const UpdatePage({Key key, this.version, this.android, this.ios}) : super(key: key);
+  const UpdatePage({Key key, this.version, this.android, this.ios, this.info}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +20,16 @@ class UpdatePage extends StatelessWidget{
         centerTitle: true,
       ),
       body: Center(
-        child: RoundBtn(
-            '下载更新',
-            Colors.cyan,
-                () =>launchURL(Platform.isAndroid ? android : ios)
-        ),
+        child: Column(
+          children: [
+            Text(info),
+            RoundBtn(
+                '下载更新',
+                Colors.cyan,
+                    () => launchURL(Platform.isAndroid ? android : ios)
+            ),
+          ],
+        )
       ),
     );
   }

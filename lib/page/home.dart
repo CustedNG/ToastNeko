@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'detail.dart';
-import 'model/cat.dart';
-import 'widget/round_shape.dart';
+import '../model/cat.dart';
+import '../widget/round_shape.dart';
 
 class HomePage extends StatefulWidget{
   @override

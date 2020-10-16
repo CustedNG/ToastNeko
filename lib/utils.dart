@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
-import 'package:cat_gallery/login.dart';
+import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
-import 'package:cat_gallery/update.dart';
+import 'package:cat_gallery/page/update.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
@@ -70,6 +70,7 @@ Future<void> checkVersion(BuildContext context) async {
                 version: version,
                 android: jsonData['android'],
                 ios: jsonData['ios'],
+                info: jsonData['info'],
               )
           ).go(context);
           print('Update version:$version available');
