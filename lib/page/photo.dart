@@ -3,11 +3,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
-import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
+import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
+import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
@@ -77,26 +79,36 @@ class PhotoPage extends StatelessWidget{
               )
             ),
             bottom: 0,
-          )
+          ),
+          StatusBarOverlay()
         ],
       )
     );
   }
   
   void tryComment(BuildContext context, String str) async {
-    if(!Provider.of<UserProvider>(context).loggedIn){
+    final userProvider = locator<UserStore>();
+    if(!userProvider.loggedIn.fetch()){
       showShouldLoginDialog(context);
       return;
     }
 
-    final _user = Provider.of<UserProvider>(context);
+    final lastTime = userProvider.lastCommentTime.fetch();
+    final nowTime = DateTime.now();
+    if(lastTime != null){
+      if(nowTime.difference(DateTime.parse(lastTime)).inSeconds < 30){
+        showWrongDialog(context, '每次上报评论间隔不小于三十秒');
+        return;
+      }
+    }
+
     await Request().go(
       'post',
       Strs.userComment,
       data: {
         Strs.keyCommentContent: {
           Strs.keyUserInfo: {
-            Strs.keyUserId: _user.openId,
+            Strs.keyUserId: userProvider.openId.fetch(),
           },
           Strs.keyCommentContent: str,
           Strs.keyCreateTime: nowDIYTime(),
@@ -107,9 +119,11 @@ class PhotoPage extends StatelessWidget{
           Strs.keyCatId: cat.id,
         }
       },
-      success: (body){
+      success: (body) async {
         showToast(context, '评论成功', false);
         Provider.of<CatProvider>(context).updateData(cat.id);
+        final userData = await locator.getAsync<UserStore>();
+        userData.lastCommentTime.put(nowTime.toString());
       },
       failed: (code) => showWrongToast(context, code)
     );

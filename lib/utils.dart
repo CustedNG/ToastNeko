@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
-import 'package:cat_gallery/page/update.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
@@ -65,14 +65,33 @@ Future<void> checkVersion(BuildContext context) async {
         Map<String, dynamic> jsonData = json.decode(data);
         int version = int.parse(jsonData['version']);
         if(version > Strs.versionCode){
-          AppRoute(
-              UpdatePage(
-                version: version,
-                android: jsonData['android'],
-                ios: jsonData['ios'],
-                info: jsonData['info'] ?? '',
-              )
-          ).go(context);
+          showRoundDialog(
+              context,
+              '检测到更新',
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('最新版本：$version'),
+                  Text(jsonData['info'] ?? '暂无更新日志'),
+                  SizedBox(height: 20),
+                  Text('是否更新？')
+                ],
+              ),
+              [
+                FlatButton(
+                    onPressed: () => launchURL(Platform.isAndroid
+                        ? jsonData['android']
+                        : jsonData['ios']
+                    ),
+                    child: Text('好👌')
+                ),
+                FlatButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('不❌')
+                )
+              ]
+          );
           print('Update version:$version available');
         }
       }

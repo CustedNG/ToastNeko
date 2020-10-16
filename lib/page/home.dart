@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage>
   int _index;
   double _padding;
   FixedExtentScrollController _fixedExtentScrollController;
-  List<Cat> catList = new List<Cat>();
+  List<Cat> catList = List<Cat>();
   bool isOnTap = false;
   AnimationController _controller;
   CurvedAnimation _curvedAnimation;
@@ -65,6 +65,14 @@ class _HomePageState extends State<HomePage>
       isBusy = false;
     });
     checkVersion(context);
+  }
+
+  @override
+  void dispose() {
+    _fixedExtentScrollController.dispose();
+    _controller.dispose();
+    catStore = null;
+    super.dispose();
   }
 
   @override

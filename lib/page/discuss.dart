@@ -66,15 +66,15 @@ class _ChatPageState extends State<ChatPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('111'),
+        Text(widget.commentData[index].nick + ': '),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('111'),
+            Text(widget.commentData[index].content),
             ExpandChild(
-              child: Text(widget.commentData[index].content),
+              child: Text('该功能还在开发'),
             )
           ],
         )

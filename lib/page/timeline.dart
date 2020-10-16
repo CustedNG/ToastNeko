@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
@@ -8,7 +9,6 @@ import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
-import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +32,6 @@ class _TimelinePageState extends State<TimelinePage> {
 
   final _textFieldController = TextEditingController();
   final _textFieldController2 = TextEditingController();
-  final _userStore = locator<UserStore>();
   UserProvider _user;
   final _catStore = locator<CatStore>();
 
@@ -54,6 +53,13 @@ class _TimelinePageState extends State<TimelinePage> {
     Icons.local_library,
     Icons.home
   ];
+
+  @override
+  void dispose() {
+    super.dispose();
+    _textFieldController.dispose();
+    _textFieldController2.dispose();
+  }
 
   @override
   void initState() {
@@ -108,7 +114,7 @@ class _TimelinePageState extends State<TimelinePage> {
     if(_isUploading)return;
     _isUploading = true;
     setState(() {});
-    final lastTime = _userStore.lastCommentTime.fetch();
+    final lastTime = _user.lastFeedbackTime;
     final nowTime = DateTime.now();
     final textValue1 = _textFieldController.value.text;
     final textValue2 = _textFieldController2.value.text;
@@ -136,9 +142,9 @@ class _TimelinePageState extends State<TimelinePage> {
             'location': textValue1,
             'time': nowDIYTime(),
             'duration': 0,
-            'nick': _userStore.nick.fetch(),
+            'nick': _user.nick,
             'msg': textValue2,
-            'open_id': _userStore.openId.fetch()
+            'open_id': _user.openId
           }
         },
         success: (body) async {
@@ -147,7 +153,7 @@ class _TimelinePageState extends State<TimelinePage> {
             initData();
             _textFieldController.clear();
             _textFieldController2.clear();
-            _userStore.lastCommentTime.put(nowTime.toString());
+            _user.setLastFeedbackTime(nowTime.toString());
             Navigator.of(context).pop();
           });
         },
@@ -251,18 +257,20 @@ class _TimelineActivity extends StatelessWidget {
           leftChild = _LeftChildTimeline(step: step);
         }
 
-        return TimelineTile(
-          alignment: TimelineAlign.manual,
-          isFirst: index == 0,
-          isLast: index == steps.length - 1,
-          lineXY: 0.15,
-          indicatorStyle: indicator,
-          startChild: leftChild,
-          endChild: rightChild,
-          hasIndicator: step.isCheckpoint,
-          beforeLineStyle: LineStyle(
-            color: step.color,
-            thickness: 8,
+        return FadeIn(
+          child: TimelineTile(
+            alignment: TimelineAlign.manual,
+            isFirst: index == 0,
+            isLast: index == steps.length - 1,
+            lineXY: 0.15,
+            indicatorStyle: indicator,
+            startChild: leftChild,
+            endChild: rightChild,
+            hasIndicator: step.isCheckpoint,
+            beforeLineStyle: LineStyle(
+              color: step.color,
+              thickness: 8,
+            ),
           ),
         );
       },

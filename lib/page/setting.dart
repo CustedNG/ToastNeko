@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:animate_do/animate_do.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
@@ -8,6 +12,7 @@ import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:cat_gallery/widget/round_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../widget/round_shape.dart';
 import '../widget/setting_item.dart';
 
@@ -22,6 +27,10 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
   double _scale;
   UserProvider _user;
   bool _isChangingNick;
+  final panelBorder = BorderRadius.only(
+    topLeft: Radius.circular(24.0),
+    topRight: Radius.circular(24.0),
+  );
 
   final _nickController = TextEditingController();
   final _nickFocusNode = FocusNode();
@@ -45,6 +54,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
   @override
   void dispose() {
     _controller.dispose();
+    _nickController.dispose();
+    _nickFocusNode.dispose();
     super.dispose();
   }
 
@@ -58,10 +69,64 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
-        title: Text(Strs.appName),
+        title: FadeAnimatedTextKit(
+            text: [Strs.appName, '欢迎，${_user.nick}'],
+            isRepeatingAnimation: true,
+            repeatForever: true,
+            textStyle: Theme.of(context).textTheme.headline6,
+        ),
         centerTitle: true,
       ),
-      body: _buildScrollView(context)
+      body: _buildUser()
+    );
+  }
+
+  Widget _buildUser(){
+    return SlidingUpPanel(
+      body: _buildScrollView(context),
+      maxHeight: 377,
+      minHeight: 77,
+      collapsed: Container(
+        decoration: BoxDecoration(
+            color: Colors.blueGrey,
+            borderRadius: panelBorder
+        ),
+        child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.keyboard_arrow_up, color: Colors.white),
+                Row(
+                    mainAxisAlignment: _user.loggedIn
+                        ? MainAxisAlignment.spaceEvenly
+                        : MainAxisAlignment.center,
+                    children: [
+                      !_user.loggedIn
+                          ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context)).build(context)
+                          : RoundBtn('退出登录', Colors.redAccent, () => _user.logout()).build(context),
+                      _user.loggedIn
+                          ? RoundBtn('修改昵称', Colors.cyan, () => _buildNickDialog(context))
+                          : Container(),
+                    ]
+                ),
+                SizedBox(height: 13),
+              ],
+            )
+        ),
+      ),
+      panel: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: panelBorder
+        ),
+        child: Center(child: Text('你当前还没有任何消息')),
+      ),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(26.0),
+        topRight: Radius.circular(26.0),
+      ),
     );
   }
 
@@ -97,28 +162,30 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
         fontWeight: FontWeight.bold
     );
 
-    return Card(
-      elevation: 10.0,
-      shape: RoundShape().build(),
-      clipBehavior: Clip.antiAlias,
-      semanticContainer: false,
-      child: Stack(
-        children: <Widget>[
-          AspectRatio(
-            aspectRatio: 25 / 11,
-            child: Image.asset(
-                Strs.bannerToastNeko,
-                fit: BoxFit.cover),
-          ),
-          Positioned(
-              bottom: 5,
-              right: 8,
-              child: Text(
-                'Ver: Beta 0.0.1',
-                style: bannerTextStyle,
-              )
-          )
-        ],
+    return BounceInDown(
+      child: Card(
+        elevation: 10.0,
+        shape: RoundShape().build(),
+        clipBehavior: Clip.antiAlias,
+        semanticContainer: false,
+        child: Stack(
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 25 / 11,
+              child: Image.asset(
+                  Strs.bannerToastNeko,
+                  fit: BoxFit.cover),
+            ),
+            Positioned(
+                bottom: 5,
+                right: 8,
+                child: Text(
+                  'Ver: Beta 0.0.1',
+                  style: bannerTextStyle,
+                )
+            )
+          ],
+        ),
       ),
     );
   }
@@ -126,11 +193,12 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
   Widget _buildSetting(BuildContext context){
     return Column(
       children: [
-        SizedBox(height: 20.0),
+        SizedBox(height: 17.0),
         Text(Strs.about),
-        SizedBox(height: 10.0),
+        SizedBox(height: 7.0),
+        SettingItem(title: '抽奖', onTap: () => _buildLotteryDialog()),
         SettingItem(title: Strs.joinUserGroup, onTap: () => launchURL(Strs.joinQQUrl)),
-        SizedBox(height: 20.0),
+        SizedBox(height: 17.0),
         SettingItem(title: Strs.usageHelp, onTap: () =>
             showRoundDialog(
                 context,
@@ -154,22 +222,45 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
                 ]
             )
         ),
-        SizedBox(height: 40),
-        Row(
-            mainAxisAlignment: _user.loggedIn
-                ? MainAxisAlignment.spaceEvenly
-                : MainAxisAlignment.center,
-            children: [
-              !_user.loggedIn
-                  ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context)).build(context)
-                  : RoundBtn('退出登录', Colors.redAccent, () => _user.logout()).build(context),
-              _user.loggedIn
-                  ? RoundBtn('修改昵称', Colors.cyan, () => _buildNickDialog(context))
-                  : Container(),
-            ]
-        ),
-        SizedBox(height: 40.0)
       ],
+    );
+  }
+
+  void _buildLotteryDialog(){
+    bool loggedIn = _user.loggedIn;
+
+    if(!loggedIn){
+      showRoundDialog(
+          context,
+          '请登录',
+          Text('需要登录来验证你是否是长理学子，以便判断抽奖资格'),
+          [
+            FlatButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('好')
+            )
+          ]
+      );
+      return;
+    }
+
+    showRoundDialog(
+        context,
+        '你的兑换码',
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(base64Encode(utf8.encode(_user.openId.replaceFirst('2020', '0202')))),
+            SizedBox(height: 7),
+            Text('请加入用户群，以获取中奖信息')
+          ],
+        ),
+        [
+          FlatButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('我收下了')
+          )
+        ]
     );
   }
 

@@ -34,6 +34,7 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMixin{
   List<Comment> _comments = [];
   bool notBusy = false;
+  CatProvider _catProvider;
 
   @override
   void initState(){
@@ -44,7 +45,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
   }
 
   Future<void> initData() async {
-    final _catProvider = Provider.of<CatProvider>(context);
+    _catProvider = Provider.of<CatProvider>(context);
     final catJson = await _catProvider.fetch(widget.cat.id);
     final commentsData = json.decode(catJson)[Strs.keyComment];
     for(Map<String, dynamic> comment in commentsData){
@@ -110,6 +111,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
                       _commentsList.length != 0
                           ? _commentsList[Random().nextInt(_commentsList.length)]
                           : '暂无评论\n${widget.cat.displayName}想要评论',
+                      textScaleFactor: 1.0,
                       style: TextStyle(fontSize: 12.0, color: Colors.white),
                   ),
                 )
@@ -140,7 +142,25 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
             mainAxisSpacing: 4.0,
             crossAxisSpacing: 4.0,
           ),
-          StatusBarOverlay()
+          StatusBarOverlay(),
+          Positioned(
+            top: 57,
+            right: 27,
+            child: GestureDetector(
+              child: Icon(Icons.info_outline, color: Colors.red),
+              onTap: () => showRoundDialog(
+                  context,
+                  '性别未知',
+                  Text('如果您知道${widget.cat.displayName}的性别，请加入用户群，向管理员反馈该信息，谢谢！'),
+                  [
+                    FlatButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('好')
+                    )
+                  ]
+              ),
+            ),
+          )
         ],
       ),
       floatingActionButton: FabCircularMenu(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
@@ -21,6 +22,14 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordFocusNode = FocusNode();
   bool _isBusy = false;
   final _userStore = locator<UserStore>();
+
+  @override
+  void dispose(){
+    super.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _passwordFocusNode.dispose();
+  }
 
   Future<void> tryLogin() async {
     if (_isBusy) return;
@@ -154,28 +163,30 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Welcome',
-          style: TextStyle(
-            fontSize: 60,
-            color: Colors.white,
+    return ElasticInRight(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Welcome',
+            style: TextStyle(
+              fontSize: 60,
+              color: Colors.white,
+            ),
           ),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text(
-          'Toast Neko',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 60,
-            color: Colors.white,
+          SizedBox(
+            width: 10,
           ),
-        )
-      ],
+          Text(
+            'Toast Neko',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 60,
+              color: Colors.white,
+            ),
+          )
+        ],
+      ),
     );
   }
 }
