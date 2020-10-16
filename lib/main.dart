@@ -16,7 +16,7 @@ Future<void> init() async {
   await setupLocator(appDocDir.path);
   await initCatData();
   locator<UserProvider>().loadLocalData();
-  locator<CatProvider>().loadLocalData();
+  locator<CatProvider>().loadData();
 }
 
 void main() async {

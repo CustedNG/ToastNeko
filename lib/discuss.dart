@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
-import 'package:cat_gallery/store/cat_store.dart';
 import 'package:expand_widget/expand_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -56,10 +53,32 @@ class _ChatPageState extends State<ChatPage> {
     return ListView.builder(
         itemCount: widget.commentData.length,
         itemBuilder: (context, index){
-          return ExpandChild(
-            child: Text(widget.commentData[index].content),
+          return Padding(
+              padding: EdgeInsets.all(17),
+              child: _buildCommentItem(index)
           );
         }
+    );
+  }
+
+  Widget _buildCommentItem(int index){
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('111'),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('111'),
+            ExpandChild(
+              child: Text(widget.commentData[index].content),
+            )
+          ],
+        )
+      ],
     );
   }
 }

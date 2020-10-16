@@ -33,7 +33,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMixin{
   List<Comment> _comments = [];
-  bool isBusy = false;
+  bool notBusy = false;
 
   @override
   void initState(){
@@ -44,8 +44,8 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
   }
 
   Future<void> initData() async {
-    final _catStore = Provider.of<CatProvider>(context);
-    final catJson = await _catStore.fetch(widget.cat.id);
+    final _catProvider = Provider.of<CatProvider>(context);
+    final catJson = await _catProvider.fetch(widget.cat.id);
     final commentsData = json.decode(catJson)[Strs.keyComment];
     for(Map<String, dynamic> comment in commentsData){
       _comments.add(
@@ -60,7 +60,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
       );
     }
     setState(() {
-      isBusy = true;
+      notBusy = true;
     });
   }
 
@@ -76,7 +76,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
         );
     });
 
-    return isBusy ? GestureDetector(
+    return notBusy ? GestureDetector(
       onTap: () => AppRoute(
           PhotoPage(
             url: url,

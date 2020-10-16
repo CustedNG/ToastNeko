@@ -109,7 +109,7 @@ class PhotoPage extends StatelessWidget{
       },
       success: (body){
         showToast(context, '评论成功', false);
-        Provider.of<CatProvider>(context).loadLocalData();
+        Provider.of<CatProvider>(context).updateData(cat.id);
       },
       failed: (code) => showWrongToast(context, code)
     );

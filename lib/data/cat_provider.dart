@@ -7,19 +7,35 @@ import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/utils.dart';
 
 class CatProvider extends BusyProvider {
-  var _catJson;
-  dynamic get catJson => _catJson;
+  CatStore _catStore;
+  CatStore get catStore => _catStore;
 
-  Future<void> loadLocalData() async {
+  Future<void> loadData() async {
     final catData = await locator.getAsync<CatStore>();
-    _catJson = catData.allCats.fetch();
+    _catStore = catData;
 
-    final jsonData = json.decode(_catJson);
+    updateData();
+    notifyListeners();
+  }
+
+  void updateData([String nekoId]) async {
+    if(nekoId != null){
+      initSpecificCatData(nekoId, _catStore);
+      refreshData();
+      return;
+    }
+
+    final jsonData = json.decode(_catStore.allCats.fetch());
     jsonData['neko_list'].forEach((cat) async {
       final catId = cat['neko_id'];
-      initSpecificCatData(catId, catData);
+      initSpecificCatData(catId, _catStore);
     });
 
+    refreshData();
+  }
+
+  void refreshData() async {
+    _catStore = await locator.getAsync<CatStore>();
     notifyListeners();
   }
 
@@ -27,6 +43,7 @@ class CatProvider extends BusyProvider {
     await busyRun(() async {
       final catData = await locator.getAsync<CatStore>();
       catData.put(nekoId, data);
+      _catStore = catData;
     });
   }
 
