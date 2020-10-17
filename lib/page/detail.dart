@@ -144,7 +144,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
           ),
           StatusBarOverlay(),
           Positioned(
-            top: 57,
+            top: 53,
             right: 27,
             child: GestureDetector(
               child: Icon(Icons.info_outline, color: Colors.red),

@@ -171,3 +171,6 @@ String nowDIYTime(){
   return '${dateTime.year}-${dateTime.month}-${dateTime.day} '
       '${dateTime.hour}:${dateTime.minute}';
 }
+
+dynamic kv(dynamic dict, String key, [dynamic defaultValue]) =>
+    defaultValue == null ? dict[key] ?? '' : dict[key] ?? defaultValue;

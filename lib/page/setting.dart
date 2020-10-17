@@ -70,10 +70,10 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
       appBar: AppBar(
         leading: Container(),
         title: FadeAnimatedTextKit(
-            text: [Strs.appName, '欢迎，${_user.nick}'],
+            text: [Strs.appName, _user.loggedIn ? '欢迎，${_user.nick}' : '🐱'],
             isRepeatingAnimation: true,
             repeatForever: true,
-            textStyle: Theme.of(context).textTheme.headline6,
+            textStyle: Theme.of(context).textTheme.headline6.copyWith(color: Colors.white),
         ),
         centerTitle: true,
       ),
@@ -104,8 +104,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
                         : MainAxisAlignment.center,
                     children: [
                       !_user.loggedIn
-                          ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context)).build(context)
-                          : RoundBtn('退出登录', Colors.redAccent, () => _user.logout()).build(context),
+                          ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context))
+                          : RoundBtn('退出登录', Colors.redAccent, () => _user.logout()),
                       _user.loggedIn
                           ? RoundBtn('修改昵称', Colors.cyan, () => _buildNickDialog(context))
                           : Container(),
@@ -121,7 +121,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
             color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: panelBorder
         ),
-        child: Center(child: Text('你当前还没有任何消息')),
+        child: Center(child: Text('你当前还没有任何消息（功能开发中）')),
       ),
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(26.0),

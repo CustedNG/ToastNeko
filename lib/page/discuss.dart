@@ -32,7 +32,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.cat.displayName}的粉丝发言'),
+        title: Text('${widget.cat.displayName}的粉丝发言(功能开发中)'),
         centerTitle: true,
       ),
       body: Theme(

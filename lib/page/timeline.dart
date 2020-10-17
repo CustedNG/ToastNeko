@@ -82,14 +82,14 @@ class _TimelinePageState extends State<TimelinePage> {
       if(_steps.isEmpty)_steps.add(
           Step(
             type: Type.line,
-            duration: position['duration'],
+            duration: 0,
             color: colorList[Random().nextInt(8)],
           )
       );
       _steps.add(
           Step(
             type: Type.checkpoint,
-            message: position['time'],
+            message: kv(position, 'time') + '于' + kv(position, 'location'),
             color: colorList[Random().nextInt(8)],
             icon: iconList[Random().nextInt(6)]
           )
@@ -97,10 +97,10 @@ class _TimelinePageState extends State<TimelinePage> {
       _steps.add(
           Step(
               type: Type.line,
-              duration: position['duration'],
-              message: (position['nick'] ?? '') + ' 发现 ' +
+              duration: 0,
+              message: kv(position, 'nick') + ' 发现 ' +
                    widget.catName +
-                  ' 在' + position['msg'],
+                  ' 在' + kv(position, 'msg'),
               color: colorList[Random().nextInt(8)],
           )
       );
