@@ -43,11 +43,11 @@ class MyApp extends StatelessWidget {
               )
           ),
           nextScreen: MyHomePage(title: Strs.appName),
-          duration: 1000,
+          duration: 1677,
           splashIconSize: 137,
           backgroundColor: Color.fromRGBO(243, 233, 198, 1),
           curve: Curves.easeInOutCubic,
-          animationDuration: Duration(milliseconds: 777),
+          animationDuration: Duration(milliseconds: 977),
           splashTransition: SplashTransition.rotationTransition,
           pageTransitionType: PageTransitionType.fade,
         )

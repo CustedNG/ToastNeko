@@ -3,11 +3,13 @@ import 'dart:io';
 
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -98,6 +100,21 @@ Future<void> checkVersion(BuildContext context) async {
   );
 }
 
+Future<void> getUserMsg(BuildContext context) async {
+  final user = Provider.of<UserProvider>(context);
+  user.loggedIn ? await Request().go(
+    'get',
+    Strs.userGetMsg,
+    data: {
+      Strs.keyUserId : user.openId
+    },
+    success: (data){
+      user.setMsg(data);
+    },
+    failed: (code) => showWrongToast(context, code)
+  ) : print('还未登录');
+}
+
 void unawaited(Future<void> future) {}
 
 void showToast(BuildContext context, String content, bool isLong) =>
@@ -172,5 +189,5 @@ String nowDIYTime(){
       '${dateTime.hour}:${dateTime.minute}';
 }
 
-dynamic kv(dynamic dict, String key, [dynamic defaultValue]) =>
-    defaultValue == null ? dict[key] ?? '' : dict[key] ?? defaultValue;
+dynamic kv(dynamic dict, String key, [dynamic defaultValue = '']) =>
+    dict[key] ?? defaultValue;

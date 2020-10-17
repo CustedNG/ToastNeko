@@ -56,7 +56,8 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
               comment[Strs.keyCommentID],
               comment[Strs.keyUserInfo][Strs.keyUserId],
               comment[Strs.keyCreateTime],
-              comment[Strs.keyFileName]
+              comment[Strs.keyFileName],
+              comment[Strs.keyReply]
           )
       );
     }
@@ -138,7 +139,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
                 child: _buildCard(index)
             ),
             staggeredTileBuilder: (int index) =>
-                StaggeredTile.count(2, index.isEven ? 3.5 : 4),
+                StaggeredTile.count(2, index.isEven ? 3.15 : 3.6),
             mainAxisSpacing: 4.0,
             crossAxisSpacing: 4.0,
           ),

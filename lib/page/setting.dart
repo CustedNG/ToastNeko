@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:animate_do/animate_do.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
@@ -10,11 +9,11 @@ import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:cat_gallery/widget/round_btn.dart';
+import 'package:cat_gallery/widget/round_shape.dart';
+import 'package:cat_gallery/widget/setting_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import '../widget/round_shape.dart';
-import '../widget/setting_item.dart';
 
 class InfoPage extends StatefulWidget{
   @override
@@ -69,12 +68,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
-        title: FadeAnimatedTextKit(
-            text: [Strs.appName, _user.loggedIn ? '欢迎，${_user.nick}' : '🐱'],
-            isRepeatingAnimation: true,
-            repeatForever: true,
-            textStyle: Theme.of(context).textTheme.headline6.copyWith(color: Colors.white),
-        ),
+        title: Text(Strs.appName),
         centerTitle: true,
       ),
       body: _buildUser()
@@ -104,8 +98,10 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
                         : MainAxisAlignment.center,
                     children: [
                       !_user.loggedIn
-                          ? RoundBtn('登录', Colors.cyan, () => AppRoute(LoginPage()).go(context))
-                          : RoundBtn('退出登录', Colors.redAccent, () => _user.logout()),
+                          ? RoundBtn('登录', Colors.cyan, () =>
+                              AppRoute(LoginPage()).go(context))
+                          : RoundBtn('退出登录', Colors.redAccent, () =>
+                              setState(() => _user.logout())),
                       _user.loggedIn
                           ? RoundBtn('修改昵称', Colors.cyan, () => _buildNickDialog(context))
                           : Container(),
@@ -121,12 +117,58 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
             color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: panelBorder
         ),
-        child: Center(child: Text('你当前还没有任何消息（功能开发中）')),
+        child: _user.loggedIn ? _buildMsgList(context, _user) : Center(child: Text('请先登录'))
       ),
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(26.0),
         topRight: Radius.circular(26.0),
       ),
+    );
+  }
+
+  // ignore: missing_return
+  Widget _buildMsgList(BuildContext context, UserProvider user){
+    try{
+      final msgList = kv(json.decode(user.msg), 'msg_list', ['']);
+      final listLength = msgList.length + 2;
+      return ListView.builder(
+          itemCount: listLength,
+          itemBuilder: (context, index){
+            return index == 0
+                ? Padding(
+                padding: EdgeInsets.fromLTRB(0, 7, 0, 60),
+                child: Icon(Icons.keyboard_arrow_down)
+            )
+                : Center(child:
+            Padding(
+                padding: EdgeInsets.all(17),
+                child: msgList.length == 0
+                    ? Text('你当前没有任何消息')
+                    : (index == listLength - 1 ? '~~~' : _buildCommentItem(msgList, index - 1))
+            )
+            );
+          }
+      );
+    }catch(e){
+      print(e);
+    }
+  }
+
+  Widget _buildCommentItem(dynamic msgList, int index){
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(msgList[index].nick + '回复了你: '),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(msgList[index].content)
+          ],
+        )
+      ],
     );
   }
 

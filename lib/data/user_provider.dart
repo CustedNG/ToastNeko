@@ -65,6 +65,12 @@ class UserProvider extends BusyProvider {
     unawaited(userData.nick.put(nickName));
   }
 
+  Future<void> setMsg(String msg) async {
+    _msg = msg;
+    final userData = await locator.getAsync<UserStore>();
+    unawaited(userData.msg.put(msg));
+  }
+
   Future<void> _setLoginState(bool state) async {
     _loggedIn = state;
     final userData = await locator.getAsync<UserStore>();

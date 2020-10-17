@@ -39,9 +39,11 @@ class _HomePageState extends State<HomePage>
 
     catData = json.decode(catStore.allCats.fetch());
     final nekoList = catData['neko_list'];
+    if(nekoList == null)return;
 
     _index = nekoList.length - 1;
     _fixedExtentScrollController = FixedExtentScrollController(initialItem: _index);
+
 
     nekoList.forEach((cat){
       Map<String, dynamic> catJson = json.decode(catStore.fetch(cat[Strs.keyCatId]));
@@ -78,6 +80,9 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      getUserMsg(context);
+    });
     initData();
 
     _controller = AnimationController(

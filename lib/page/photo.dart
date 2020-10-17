@@ -51,7 +51,7 @@ class PhotoPage extends StatelessWidget{
               left: 10,
               child: SafeArea(
                 child: IconButton(
-                    icon: Icon(Icons.close),
+                    icon: Icon(Icons.close, color: Colors.grey),
                     onPressed: () => Navigator.of(context).pop()
                 )
               )

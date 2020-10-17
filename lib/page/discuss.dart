@@ -15,6 +15,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   bool _isBusy = true;
+  Map<Comment, List<Comment>> data;
 
   @override
   void initState() {
@@ -24,6 +25,9 @@ class _ChatPageState extends State<ChatPage> {
 
   void initData() async{
     _isBusy = false;
+    widget.commentData.forEach((element) {
+      //if(element)
+    });
     setState(() {
     });
   }
@@ -32,7 +36,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.cat.displayName}的粉丝发言(功能开发中)'),
+        title: Text('${widget.cat.displayName}的粉丝发言'),
         centerTitle: true,
       ),
       body: Theme(
@@ -74,7 +78,13 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Text(widget.commentData[index].content),
             ExpandChild(
-              child: Text('该功能还在开发'),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('该功能还在开发')
+                ]
+              ),
             )
           ],
         )

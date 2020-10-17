@@ -4,9 +4,9 @@ class Strs{
 
   //url
   static const String baseUrl = 'https://neko.lacus.site';
-  static const String apiVersion = '1';
-  static const String baseApiUrl = baseUrl + '/v' + apiVersion;
-  static const String baseImgUrl = baseUrl + '/images/';
+  static const String apiVersion = 'dev';
+  static const String baseApiUrl = baseUrl + '/' + apiVersion;
+  static const String baseImgUrl = baseApiUrl + '/images/';
   static const String baseUserApiUrl = baseApiUrl + '/user';
   static const String baseAdminApiUrl = baseApiUrl + '/admin';
   static const String baseCommonApiUrl = baseApiUrl + '/common';
@@ -15,6 +15,7 @@ class Strs{
   static const String userChangeNick = baseUserApiUrl + '/nick';
   static const String userClearNotification = baseUserApiUrl + '/clear';
   static const String userComment = baseUserApiUrl + '/comment';
+  static const String userGetMsg = baseUserApiUrl + '/msg';
 
   static const String publicGetVersion = baseCommonApiUrl + '/version';
   static const String publicGetAllCats = baseCommonApiUrl + '/neko';
@@ -51,6 +52,7 @@ class Strs{
   static const String keyCommentPosition = 'position';
   static const String keyReply = 'reply';
   static const String keyReplyId = 'reply_id';
+  static const String keyIsReply = 'is_reply';
   static const String keyCreateTime = 'create_time';
   static const String keyFileName = 'file_name';
 

@@ -89,7 +89,7 @@ class _TimelinePageState extends State<TimelinePage> {
       _steps.add(
           Step(
             type: Type.checkpoint,
-            message: kv(position, 'time') + '于' + kv(position, 'location'),
+            message: kv(position, 'time') + ' 于 ' + kv(position, 'location'),
             color: colorList[Random().nextInt(8)],
             icon: iconList[Random().nextInt(6)]
           )
