@@ -20,7 +20,7 @@ class _IntroScreenState extends State<IntroScreen> {
       Slide(
         title: '登录',
         description: '关于界面点击底部即可登录，评论、反馈等功能登录后方可操作',
-        pathImage: 'assets/intro/login.PNG',
+        pathImage: 'assets/intro/login.jpg',
         backgroundColor: Colors.cyan,
       ),
     );
@@ -28,7 +28,7 @@ class _IntroScreenState extends State<IntroScreen> {
       Slide(
         title: '评论',
         description: '点击任意图片，在底部输入想要评论的内容，再点击发送即可',
-        pathImage: 'assets/intro/comment.PNG',
+        pathImage: 'assets/intro/comment.jpg',
         backgroundColor: Colors.pinkAccent,
       ),
     );
@@ -36,7 +36,7 @@ class _IntroScreenState extends State<IntroScreen> {
       Slide(
         title: '反馈猫猫踪迹',
         description: '进入踪迹页后，点击右下角按钮，输入信息点击发送即可',
-        pathImage: 'assets/intro/feedback.PNG',
+        pathImage: 'assets/intro/feedback.jpg',
         backgroundColor: Colors.purple,
       ),
     );
