@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/page/intro.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/utils.dart';
@@ -15,17 +16,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class InfoPage extends StatefulWidget{
+class SettingPage extends StatefulWidget{
   @override
-  State<StatefulWidget> createState() => _InfoPageState();
+  State<StatefulWidget> createState() => _SettingPageState();
 }
 
-class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
+class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin{
   AnimationController _controller;
   CurvedAnimation _curvedAnimation;
   double _scale;
   UserProvider _user;
   bool _isChangingNick;
+  bool loggedIn;
   final panelBorder = BorderRadius.only(
     topLeft: Radius.circular(24.0),
     topRight: Radius.circular(24.0),
@@ -64,6 +66,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
     _scale = 1 - _curvedAnimation.value;
 
     if(_user.isBusy)return CircularProgressIndicator();
+    loggedIn = _user.loggedIn;
 
     return Scaffold(
       appBar: AppBar(
@@ -93,16 +96,18 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
               children: [
                 Icon(Icons.keyboard_arrow_up, color: Colors.white),
                 Row(
-                    mainAxisAlignment: _user.loggedIn
+                    mainAxisAlignment: loggedIn
                         ? MainAxisAlignment.spaceEvenly
                         : MainAxisAlignment.center,
                     children: [
-                      !_user.loggedIn
+                      !loggedIn
                           ? RoundBtn('登录', Colors.cyan, () =>
                               AppRoute(LoginPage()).go(context))
-                          : RoundBtn('退出登录', Colors.redAccent, () =>
-                              setState(() => _user.logout())),
-                      _user.loggedIn
+                          : RoundBtn('退出登录', Colors.redAccent, (){
+                            loggedIn = false;
+                            setState(() async => await _user.logout());
+                          }),
+                      loggedIn
                           ? RoundBtn('修改昵称', Colors.cyan, () => _buildNickDialog(context))
                           : Container(),
                     ]
@@ -117,7 +122,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
             color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: panelBorder
         ),
-        child: _user.loggedIn ? _buildMsgList(context, _user) : Center(child: Text('请先登录'))
+        child: loggedIn ? _buildMsgList(context) : Center(child: Text('请先登录'))
       ),
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(26.0),
@@ -126,32 +131,27 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
     );
   }
 
-  // ignore: missing_return
-  Widget _buildMsgList(BuildContext context, UserProvider user){
-    try{
-      final msgList = kv(json.decode(user.msg), 'msg_list', ['']);
-      final listLength = msgList.length + 2;
-      return ListView.builder(
-          itemCount: listLength,
-          itemBuilder: (context, index){
-            return index == 0
-                ? Padding(
-                padding: EdgeInsets.fromLTRB(0, 7, 0, 60),
-                child: Icon(Icons.keyboard_arrow_down)
-            )
-                : Center(child:
-            Padding(
-                padding: EdgeInsets.all(17),
-                child: msgList.length == 0
-                    ? Text('你当前没有任何消息')
-                    : (index == listLength - 1 ? '~~~' : _buildCommentItem(msgList, index - 1))
-            )
-            );
-          }
-      );
-    }catch(e){
-      print(e);
-    }
+  Widget _buildMsgList(BuildContext context){
+    final msgList = json.decode(_user.msg)['msg_list'];
+    final listLength = msgList.length + 2;
+    return ListView.builder(
+        itemCount: listLength,
+        itemBuilder: (context, index){
+          return index == 0
+              ? Padding(
+                  padding: EdgeInsets.fromLTRB(0, 7, 0, 60),
+                  child: Icon(Icons.keyboard_arrow_down)
+              )
+              : Center(
+                child: Padding(
+                    padding: EdgeInsets.all(17),
+                    child: msgList.length == 0
+                      ? Text('你当前没有任何消息(该功能开发中)')
+                      : (index == listLength - 1 ? Text('~~~') : Container())//_buildCommentItem(msgList, index - 1))
+                  )
+          );
+        }
+    );
   }
 
   Widget _buildCommentItem(dynamic msgList, int index){
@@ -238,31 +238,13 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
         SizedBox(height: 17.0),
         Text(Strs.about),
         SizedBox(height: 7.0),
-        SettingItem(title: '抽奖', onTap: () => _buildLotteryDialog()),
+        _user.openId == null
+            ? SizedBox(height: 1)
+            : SettingItem(title: '抽奖', onTap: () => _buildLotteryDialog()),
         SettingItem(title: Strs.joinUserGroup, onTap: () => launchURL(Strs.joinQQUrl)),
         SizedBox(height: 17.0),
         SettingItem(title: Strs.usageHelp, onTap: () =>
-            showRoundDialog(
-                context,
-                '帮助',
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(Strs.photoWrongSolution),
-                    Text(Strs.helpText1)
-                  ],
-                ),
-                [
-                  FlatButton(
-                    child: Text('确定'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ]
-            )
+            AppRoute(IntroScreen()).go(context)
         ),
       ],
     );
@@ -345,7 +327,6 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin{
               controller: _nickController,
               focusNode: _nickFocusNode,
               maxLength: 12,
-              style: TextStyle(color: Colors.white),
               decoration: buildDecoration('想要的新昵称'),
             )
           ],

@@ -44,6 +44,7 @@ dependencies:
   toast: ^0.1.5
   animate_do: ^1.7.3
   sliding_up_panel: ^1.0.2
+  intro_slider: ^2.3.3
 
 dev_dependencies:
   flutter_test:
@@ -52,9 +53,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/custed_lite.png
-    - assets/qq_qr.jpg
-    - assets/loading.gif
     - assets/toast_neko.png
-    - assets/ic_launcher.png
     - assets/map/
+    - assets/intro/

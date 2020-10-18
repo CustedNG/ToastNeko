@@ -125,6 +125,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
+    final backGroundColor = Theme.of(context).scaffoldBackgroundColor;
     super.build(context);
     return Scaffold(
       body: Stack(
@@ -145,7 +146,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
           ),
           StatusBarOverlay(),
           Positioned(
-            top: 53,
+            top: 47,
             right: 27,
             child: GestureDetector(
               child: Icon(Icons.info_outline, color: Colors.red),
@@ -167,7 +168,8 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
       floatingActionButton: FabCircularMenu(
         ringWidth: 77,
         ringDiameter: 277,
-        ringColor: isDarkMode(context) ? Colors.black87 : Colors.white70,
+        ringColor: backGroundColor,
+        fabColor: backGroundColor,
         animationCurve: Curves.easeInOutCubic,
         children: [
           IconButton(
@@ -200,7 +202,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
           IconButton(
               icon: Icon(Icons.info_outline),
               onPressed: () => AppRoute(
-                  IntroPage(
+                  InfoPage(
                       cat: widget.cat,
                   )
               ).go(context)

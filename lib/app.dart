@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPageChanged: (index) => setState(() => _selectIndex = index),
         children: [
           HomePage(),
-          InfoPage()
+          SettingPage()
         ],
       ),
       bottomNavigationBar: _buildBottom(context),

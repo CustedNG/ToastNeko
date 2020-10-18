@@ -4,7 +4,7 @@ class Strs{
 
   //url
   static const String baseUrl = 'https://neko.lacus.site';
-  static const String apiVersion = 'dev';
+  static const String apiVersion = 'v1';
   static const String baseApiUrl = baseUrl + '/' + apiVersion;
   static const String baseImgUrl = baseApiUrl + '/images/';
   static const String baseUserApiUrl = baseApiUrl + '/user';

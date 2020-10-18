@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/core/request.dart';
@@ -23,9 +25,12 @@ class PhotoPage extends StatelessWidget{
 
   PhotoPage({Key key, this.url, this.index, this.cat, this.commentData}) : super(key: key);
 
+  final TextEditingController textEditingController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isAndroid = Platform.isAndroid;
     return Scaffold(
       body: Stack(
         children: [
@@ -62,19 +67,28 @@ class PhotoPage extends StatelessWidget{
               height: 97,
               blur: 10,
               borderRadius: BorderRadius.zero,
-              child: Column(
+              padding: EdgeInsets.only(left: 17, right: isAndroid ? 2 : 17),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  TextField(
-                    onSubmitted: (str) => tryComment(context, str),
-                    textInputAction: TextInputAction.go,
-                    maxLines: 2,
-                    minLines: 1,
-                    decoration: buildRoundDecoration(
-                        '想说点什么？',
-                        Icon(Icons.chat)
+                  Expanded(
+                    child: TextField(
+                      onSubmitted: (str) => tryComment(context, str),
+                      textInputAction: TextInputAction.send,
+                      maxLines: 2,
+                      minLines: 1,
+                      controller: textEditingController,
+                      decoration: buildRoundDecoration(
+                          '想说点什么？',
+                          Icon(Icons.chat)
+                      ),
                     ),
                   ),
+                  isAndroid ? IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: () => tryComment(context, textEditingController.value.text)
+                  ) : Container()
                 ],
               )
             ),

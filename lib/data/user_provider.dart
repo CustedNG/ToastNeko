@@ -12,6 +12,8 @@ class UserProvider extends BusyProvider {
   String _lastFeedbackTime;
   String _openId;
   String _msg;
+  String _pwd;
+  String _cid;
 
   bool get loggedIn => _loggedIn;
   String get nick => _nick;
@@ -19,6 +21,8 @@ class UserProvider extends BusyProvider {
   String get lastFeedbackTime => _lastFeedbackTime;
   String get openId => _openId;
   String get msg => _msg;
+  String get pwd => _pwd;
+  String get cid => _cid;
 
   final _initialized = Completer();
   Future get initialized => _initialized.future;
@@ -31,6 +35,8 @@ class UserProvider extends BusyProvider {
     _lastFeedbackTime = userData.lastFeedbackTime.fetch();
     _openId = userData.openId.fetch();
     _msg = userData.msg.fetch();
+    _pwd = userData.password.fetch();
+    _cid = userData.username.fetch();
     notifyListeners();
 
     _initialized.complete(null);
@@ -45,6 +51,24 @@ class UserProvider extends BusyProvider {
   Future<void> logout() async {
     unawaited(_setLoginState(false));
     notifyListeners();
+  }
+
+  void setUserName(String userName) async{
+    _cid = userName;
+    final userData = await locator.getAsync<UserStore>();
+    unawaited(userData.username.put(userName));
+  }
+
+  void setPassword(String password) async{
+    _pwd = password;
+    final userData = await locator.getAsync<UserStore>();
+    unawaited(userData.password.put(password));
+  }
+  
+  void setOpenId(String openId) async{
+    _openId = openId;
+    final userData = await locator.getAsync<UserStore>();
+    unawaited(userData.openId.put(openId));
   }
 
   Future<void> setLastCommentTime(String lastTime) async {

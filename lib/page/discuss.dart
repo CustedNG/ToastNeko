@@ -54,12 +54,15 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildList(BuildContext context){
+    final listLen = widget.commentData.length + 1;
     return ListView.builder(
-        itemCount: widget.commentData.length,
+        itemCount: listLen,
         itemBuilder: (context, index){
           return Padding(
               padding: EdgeInsets.all(17),
-              child: _buildCommentItem(index)
+              child: index == listLen - 1
+                  ? Center(child: Text('没有更多了╮(╯▽╰)╭'))
+                  : _buildCommentItem(index)
           );
         }
     );

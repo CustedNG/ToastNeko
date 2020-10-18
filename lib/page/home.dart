@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/locator.dart';
+import 'package:cat_gallery/page/intro.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
+import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/custom_image.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
@@ -67,6 +69,31 @@ class _HomePageState extends State<HomePage>
       isBusy = false;
     });
     checkVersion(context);
+
+    Future.delayed(Duration(seconds: 2), (){
+      if(!locator<UserStore>().haveInit.fetch()){
+        showRoundDialog(
+            context,
+            '提示',
+            Text('是否查看使用说明？'),
+            [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  AppRoute(IntroScreen()).go(context);
+                  },
+                child: Text('是'),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  },
+                child: Text('否'),
+              )
+            ],
+        );
+      }
+    });
   }
 
   @override

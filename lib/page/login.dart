@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final _passwordFocusNode = FocusNode();
   bool _isBusy = false;
-  final _userStore = locator<UserStore>();
+  UserProvider _user;
 
   @override
   void dispose(){
@@ -39,6 +39,8 @@ class _LoginPageState extends State<LoginPage> {
     final username = _usernameController.value.text;
     final password = _passwordController.value.text;
 
+
+
     try {
       await Request().go(
           'post',
@@ -48,13 +50,13 @@ class _LoginPageState extends State<LoginPage> {
             Strs.keyUserPwd: password
           },
           success: (body) async {
-            _userStore.username.put(username);
-            _userStore.password.put(password);
-            Provider.of<UserProvider>(context).login();
+            _user.setUserName(username);
+            _user.setPassword(password);
+            _user.login();
             Map<String, dynamic> jsonData = json.decode(body);
-            _userStore.nick.put(jsonData[Strs.keyUserName]);
-            _userStore.openId.put(jsonData[Strs.keyUserId]);
-            await _userStore.msg.put(json.encode({'msg_list': json.encode(jsonData['msg'])}));
+            _user.setNick(jsonData[Strs.keyUserName]);
+            _user.setOpenId(jsonData[Strs.keyUserId]);
+            _user.setMsg(json.encode({'msg_list': json.encode(jsonData['msg'])}));
             Navigator.of(context).pop();
           },
           failed: (code) => print(code)
@@ -77,15 +79,18 @@ class _LoginPageState extends State<LoginPage> {
     FocusScope.of(context).requestFocus(_passwordFocusNode);
   }
 
-  void autoFillText(){
-    _usernameController.text = _userStore.username.fetch();
-    _passwordController.text = _userStore.password.fetch();
+  void autoFillText(UserProvider _user){
+    _usernameController.text = _user.cid;
+    _passwordController.text = _user.pwd;
   }
 
   @override
   void initState() {
     super.initState();
-    autoFillText();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _user = Provider.of<UserProvider>(context);
+      autoFillText(_user);
+    });
     Future.delayed(Duration(microseconds: 377), () => showToast(
         context,
         Strs.loginToast,

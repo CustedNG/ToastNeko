@@ -1,10 +1,10 @@
 import 'package:cat_gallery/model/cat.dart';
 import 'package:flutter/material.dart';
 
-class IntroPage extends StatelessWidget{
+class InfoPage extends StatelessWidget{
   final Cat cat;
 
-  const IntroPage({Key key, this.cat}) : super(key: key);
+  const InfoPage({Key key, this.cat}) : super(key: key);
 
   static const TextStyle title = TextStyle(
     fontWeight: FontWeight.bold,
