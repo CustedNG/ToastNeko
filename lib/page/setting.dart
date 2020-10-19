@@ -222,7 +222,7 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
                 bottom: 5,
                 right: 8,
                 child: Text(
-                  'Ver: Beta 0.0.1',
+                  'Ver: Beta 0.' + Strs.versionCode.toString(),
                   style: bannerTextStyle,
                 )
             )

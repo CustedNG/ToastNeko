@@ -1,10 +1,10 @@
 class Strs{
   //version
-  static const int versionCode = 4;
+  static const int versionCode = 5;
 
   //url
   static const String baseUrl = 'https://neko.lacus.site';
-  static const String apiVersion = 'v1';
+  static const String apiVersion = 'dev';
   static const String baseApiUrl = baseUrl + '/' + apiVersion;
   static const String baseImgUrl = baseApiUrl + '/images/';
   static const String baseUserApiUrl = baseApiUrl + '/user';

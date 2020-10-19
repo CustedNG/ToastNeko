@@ -62,16 +62,16 @@ class _TimelinePageState extends State<TimelinePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _user = Provider.of<UserProvider>(context);
+  }
+
+  @override
   void initState() {
     _isBusy = true;
     initData();
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _user = Provider.of<UserProvider>(context);
   }
 
   void initData() async{
@@ -112,8 +112,7 @@ class _TimelinePageState extends State<TimelinePage> {
   
   void tryUpload() async{
     if(_isUploading)return;
-    _isUploading = true;
-    setState(() {});
+    setState(() => _isUploading = true);
     final lastTime = _user.lastFeedbackTime;
     final nowTime = DateTime.now();
     final textValue1 = _textFieldController.value.text;
@@ -121,14 +120,18 @@ class _TimelinePageState extends State<TimelinePage> {
 
     if(!isInputNotRubbish([_textFieldController, _textFieldController2])){
       showWrongDialog(context, '每项输入不得小于2大于10');
-      _isUploading = false;
+      setState(() {
+        _isUploading = false;
+      });
       return;
     }
 
     if(lastTime != null){
       if(nowTime.difference(DateTime.parse(lastTime)).inMinutes < 10){
         showWrongDialog(context, '每次上报间隔不小于十分钟');
-        _isUploading = false;
+        setState(() {
+          _isUploading = false;
+        });
         return;
       }
     }
@@ -151,6 +154,7 @@ class _TimelinePageState extends State<TimelinePage> {
           await initSpecificCatData(widget.catId, _catStore);
           setState(() {
             initData();
+            _isUploading = false;
             _textFieldController.clear();
             _textFieldController2.clear();
             _user.setLastFeedbackTime(nowTime.toString());
@@ -159,7 +163,6 @@ class _TimelinePageState extends State<TimelinePage> {
         },
         failed: (code) => print(code)
     );
-    _isUploading = false;
   }
 
   void _showAddDialog(){

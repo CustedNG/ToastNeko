@@ -4,8 +4,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
-import 'package:cat_gallery/locator.dart';
-import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:flutter/material.dart';
@@ -191,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
             width: 10,
           ),
           Text(
-            'Toast Neko',
+            Strs.appName,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 60,

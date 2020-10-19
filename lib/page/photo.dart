@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
@@ -14,6 +13,7 @@ import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +41,13 @@ class PhotoPage extends StatelessWidget{
               ),
               maxScale: 3.0,
               minScale: PhotoViewComputedScale.contained,
-              imageProvider: CachedNetworkImageProvider(url),
+              imageProvider: AdvancedNetworkImage(
+                url,
+                loadedCallback: () => print('Successfully loaded $url'),
+                loadFailedCallback: () => print('Failed to load $url'),
+                useDiskCache: true,
+                cacheRule: CacheRule(maxAge: Duration(days: 30)),
+              ),
               heroAttributes: PhotoViewHeroAttributes(
                   tag: index == 0 ? cat : index.hashCode,
                   transitionOnUserGestures: true
@@ -111,7 +117,7 @@ class PhotoPage extends StatelessWidget{
       )
     );
   }
-  
+
   void tryComment(BuildContext context, String str) async {
     final userProvider = locator<UserStore>();
     if(!userProvider.loggedIn.fetch()){
