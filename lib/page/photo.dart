@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cat_gallery/core/request.dart';
@@ -7,7 +8,6 @@ import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/cat.dart';
-import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
@@ -21,9 +21,9 @@ class PhotoPage extends StatelessWidget{
   final String url;
   final int index;
   final Cat cat;
-  final List<Comment> commentData;
+  final List<String> commentList;
 
-  PhotoPage({Key key, this.url, this.index, this.cat, this.commentData}) : super(key: key);
+  PhotoPage({Key key, this.url, this.index, this.cat, this.commentList}) : super(key: key);
 
   final TextEditingController textEditingController = TextEditingController();
 
@@ -64,31 +64,43 @@ class PhotoPage extends StatelessWidget{
           Positioned(
             child: BlurryContainer(
               width: size.width,
-              height: 97,
+              height: 137,
               blur: 10,
               borderRadius: BorderRadius.zero,
-              padding: EdgeInsets.only(left: 17, right: isAndroid ? 2 : 17),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
+              padding: EdgeInsets.only(left: 17, top: 7,right: isAndroid ? 2 : 17),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      onSubmitted: (str) => tryComment(context, str),
-                      textInputAction: TextInputAction.send,
-                      maxLines: 2,
-                      minLines: 1,
-                      controller: textEditingController,
-                      decoration: buildRoundDecoration(
-                          '想说点什么？',
-                          Icon(Icons.chat)
-                      ),
-                    ),
+                  FadeAnimatedTextKit(
+                    text: commentList.isEmpty ? ['暂无评论\n赶紧评论吧'] : commentList,
+                    repeatForever: commentList.isNotEmpty,
+                    textAlign: TextAlign.center,
+                    pause: Duration(milliseconds: 1000),
                   ),
-                  isAndroid ? IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () => tryComment(context, textEditingController.value.text)
-                  ) : Container()
+                  SizedBox(height: 7),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onSubmitted: (str) => tryComment(context, str),
+                          textInputAction: TextInputAction.send,
+                          maxLines: 2,
+                          minLines: 1,
+                          controller: textEditingController,
+                          decoration: buildRoundDecoration(
+                              '想说点什么？',
+                              Icon(Icons.chat)
+                          ),
+                        ),
+                      ),
+                      isAndroid ? IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: () => tryComment(context, textEditingController.value.text)
+                      ) : Container()
+                    ],
+                  )
                 ],
               )
             ),

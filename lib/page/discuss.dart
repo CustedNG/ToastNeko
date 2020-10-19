@@ -1,5 +1,7 @@
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
+import 'package:cat_gallery/utils.dart';
+import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:expand_widget/expand_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -43,11 +45,8 @@ class _ChatPageState extends State<ChatPage> {
           data: Theme.of(context).copyWith(
             accentColor: Colors.white.withOpacity(0.2),
           ),
-          child: Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: Center(
-              child: _isBusy ? CircularProgressIndicator() : _buildList(context),
-            ),
+          child: Center(
+            child: _isBusy ? CircularProgressIndicator() : _buildList(context),
           )
       ),
     );
@@ -59,7 +58,7 @@ class _ChatPageState extends State<ChatPage> {
         itemCount: listLen,
         itemBuilder: (context, index){
           return Padding(
-              padding: EdgeInsets.all(17),
+              padding: EdgeInsets.only(left: 17, top: 17, right: 17),
               child: index == listLen - 1
                   ? Center(child: Text('没有更多了╮(╯▽╰)╭'))
                   : _buildCommentItem(index)
@@ -69,29 +68,31 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildCommentItem(int index){
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(widget.commentData[index].nick + ': '),
-        Column(
+    return Card(
+      color: isDarkMode(context) ? Colors.black : Colors.white,
+      shape: RoundShape().build(),
+      elevation: 20,
+      child: Padding(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
           children: [
-            Text(widget.commentData[index].content),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget.commentData[index].nick + ': '),
+                Text(widget.commentData[index].content, textAlign: TextAlign.right),
+              ],
+            ),
             ExpandChild(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('该功能还在开发')
-                ]
-              ),
+              child: Text('开发ing'),
             )
           ],
-        )
-      ],
+        ),
+        padding: EdgeInsets.only(left: 17, top: 17, right: 17),
+      ),
     );
   }
 }

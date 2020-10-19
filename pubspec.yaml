@@ -45,6 +45,7 @@ dependencies:
   animate_do: ^1.7.3
   sliding_up_panel: ^1.0.2
   intro_slider: ^2.3.3
+  animated_text_kit: ^2.4.1
 
 dev_dependencies:
   flutter_test:

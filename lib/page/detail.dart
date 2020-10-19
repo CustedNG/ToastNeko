@@ -78,13 +78,13 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
         );
     });
 
-    return notBusy ? GestureDetector(
+    return GestureDetector(
       onTap: () => AppRoute(
           PhotoPage(
             url: url,
             index: index,
             cat: widget.cat,
-            commentData: _comments,
+            commentList: _commentsList,
           )
       ).go(context),
       child: Card(
@@ -120,7 +120,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
           ],
         ),
       ),
-    ) : Center(child: CircularProgressIndicator());
+    );
   }
 
   @override
