@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
-import 'package:cat_gallery/page/discuss.dart';
 import 'package:cat_gallery/page/info.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
@@ -113,6 +112,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
                           ? _commentsList[Random().nextInt(_commentsList.length)]
                           : '暂无评论\n${widget.cat.displayName}想要评论',
                       textScaleFactor: 1.0,
+                      overflow: TextOverflow.fade,
                       style: TextStyle(fontSize: 12.0, color: Colors.white),
                   ),
                 )
@@ -204,15 +204,6 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
               onPressed: () => AppRoute(
                   InfoPage(
                       cat: widget.cat,
-                  )
-              ).go(context)
-          ),
-          IconButton(
-              icon: Icon(Icons.chat),
-              onPressed: () => AppRoute(
-                  ChatPage(
-                    cat: widget.cat,
-                    commentData: _comments,
                   )
               ).go(context)
           ),

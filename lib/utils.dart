@@ -9,6 +9,7 @@ import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -191,3 +192,6 @@ String nowDIYTime(){
 
 dynamic kv(dynamic dict, String key, [dynamic defaultValue = '']) =>
     dict[key] ?? defaultValue;
+
+void closeKeyboard() =>
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
