@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/model/reply.dart';
 import 'package:cat_gallery/page/info.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
@@ -56,7 +57,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
               comment[Strs.keyUserInfo][Strs.keyUserId],
               comment[Strs.keyCreateTime],
               comment[Strs.keyFileName],
-              comment[Strs.keyReply]
+              json.encode(kv(comment, Strs.keyReply, []))
           )
       );
     }
@@ -67,14 +68,27 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
 
   Widget _buildCard(int index){
     String url = Strs.baseImgUrl + widget.cat.img[index];
-    List<String> _commentsList = [];
+    List<String> _commentsStringList = [];
+    List<Comment> _commentsList = [];
+    List<Reply> _replyList = [];
     _comments.forEach((ele) {
-      if(ele.fileName == widget.cat.img[index])
-        _commentsList.add(
-            _comments[_comments.indexOf(ele)].nick
-                + '：\n'
-                + _comments[_comments.indexOf(ele)].content
-        );
+      if(ele.fileName == widget.cat.img[index]){
+          _commentsList.add(ele);
+          for(dynamic reply in json.decode(ele.reply)){
+            _replyList.add(
+                Reply(
+                    reply[Strs.keyReplyId],
+                    reply[Strs.keyCommentContent],
+                    reply[Strs.keyUserInfo][Strs.keyUserId],
+                    reply[Strs.keyUserInfo][Strs.keyUserName],
+                    reply[Strs.keyCreateTime]
+                )
+            );
+          }
+          _commentsStringList.add(
+              buildCommentString(_comments[_comments.indexOf(ele)], ':\n')
+          );
+      }
     });
 
     return GestureDetector(
@@ -84,6 +98,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
             index: index,
             cat: widget.cat,
             commentList: _commentsList,
+            replyList: _replyList,
           )
       ).go(context),
       child: Card(
@@ -97,7 +112,6 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
             SizedBox.expand(
                 child: MyImage(
                   imgUrl: url,
-                  index: index,
                 ),
             ),
             Positioned(
@@ -108,8 +122,8 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
                   width: MediaQuery.of(context).size.width / 2 - 10,
                   borderRadius: BorderRadius.zero,
                   child: Text(
-                      _commentsList.length != 0
-                          ? _commentsList[Random().nextInt(_commentsList.length)]
+                      _commentsStringList.length != 0
+                          ? _commentsStringList[Random().nextInt(_commentsStringList.length)]
                           : '暂无评论\n${widget.cat.displayName}想要评论',
                       textScaleFactor: 1.0,
                       overflow: TextOverflow.fade,

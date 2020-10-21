@@ -5,43 +5,53 @@ import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/cat.dart';
+import 'package:cat_gallery/model/comment.dart';
+import 'package:cat_gallery/model/reply.dart';
 import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
+import 'package:cat_gallery/widget/custom_image.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:expand_widget/expand_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class PhotoPage extends StatelessWidget{
+class PhotoPage extends StatefulWidget{
   final String url;
   final int index;
   final Cat cat;
-  final List<String> commentList;
+  final List<Comment> commentList;
+  final List<Reply> replyList;
 
-  PhotoPage({Key key, this.url, this.index, this.cat, this.commentList}) : super(key: key);
+  PhotoPage({Key key, this.url, this.index, this.cat, this.commentList, this.replyList}) : super(key: key);
 
+  @override
+  _PhotoPageState createState() => _PhotoPageState();
+}
+
+class _PhotoPageState extends State<PhotoPage> {
   final TextEditingController textEditingController = TextEditingController();
+  final PanelController panelController = PanelController();
+  final boxShadow = BoxShadow(blurRadius: 48.0, color: Colors.black38);
+  bool isPanelOpen = false;
+  final FocusNode focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SlidingUpPanel(
+        controller: panelController,
         body: _buildBody(context),
         collapsed: _buildContainer(context, _buildCollapsed(context)),
         panel: _buildContainer(context, _buildPanel(context)),
         minHeight: 107,
         maxHeight: 337,
-        boxShadow: [
-          const BoxShadow(
-            blurRadius: 48.0,
-            color: Colors.black38,
-          )
-        ],
+        onPanelOpened: () => setState(() => isPanelOpen = true),
+        onPanelClosed: () => setState(() => isPanelOpen = false),
+        boxShadow: [boxShadow],
         borderRadius: buildBorderRadius(26),
       )
     );
@@ -65,41 +75,75 @@ class PhotoPage extends StatelessWidget{
   }
 
   Widget _buildPanel(BuildContext context){
-    return ListView.separated(
-      physics: BouncingScrollPhysics(),
-      itemCount: commentList.length + 1,
-      itemBuilder: (ctx, index){
-        final comment = commentList[index > 0 ? index - 1 : 0].split('\n');
-        final username = comment[0].split('：');
-        return index != 0 ? Padding(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(comment[0]),
-                  Text(comment[1]),
-                ],
-              ),
-              SizedBox(height: 17),
-              ExpandChild(
-                arrowSize: 23,
-                expandedHint: '收起',
-                collapsedHint: '展开',
-                expandArrowStyle: ExpandArrowStyle.both,
-                arrowPadding: EdgeInsets.only(top: 7),
-                child: _buildTextField(context, false, '回复${username[0]}:', icon: Icon(Icons.add_comment)),
-              )
-            ],
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 17, bottom: 17),
+          child: Icon(Icons.keyboard_arrow_down),
+        ),
+        SizedBox(
+          height: 279,
+          width: MediaQuery.of(context).size.width,
+          child: ListView.separated(
+            physics: BouncingScrollPhysics(),
+            itemCount: widget.commentList.length,
+            itemBuilder: (ctx, index){
+              final fontSize = Theme.of(context).textTheme.bodyText2.fontSize;
+              final comment = widget.commentList[index];
+              final List<Comment> replyList = [];
+              final replyLength = replyList.length + 1;
+              final commentNameWidth = comment.nick.length * fontSize / 2;
+              return Padding(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(comment.nick + ': ' + comment.content),
+                        FlatButton(
+                          onPressed: (){
+                            panelController.close();
+                            Future.delayed(Duration(milliseconds: 577), () => FocusScope.of(context).requestFocus(focusNode));
+                          },
+                          child: Text('回复'),
+                          padding: EdgeInsets.all(1),
+                          minWidth: 47,
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 7),
+                    replyLength == 1 ? Container() : ExpandChild(
+                      arrowSize: 23,
+                      expandedHint: '收起',
+                      collapsedHint: '展开',
+                      expandArrowStyle: ExpandArrowStyle.both,
+                      arrowPadding: EdgeInsets.zero,
+                      child: Row(
+                        children: [
+                          SizedBox(width: commentNameWidth),
+                          SizedBox(
+                            height: fontSize * replyLength * 1.35,
+                            width: MediaQuery.of(context).size.width - commentNameWidth - 34,
+                            child: ListView.builder(
+                              itemCount: replyLength,
+                              itemBuilder: (ctx, index){
+                                return Text(buildCommentString(replyList[index], ': '));
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.fromLTRB(17, 0, 17, 0),
+              );
+            },
+            separatorBuilder: (ctx, index) => Divider(),
           ),
-          padding: EdgeInsets.fromLTRB(17, 7, 17, 0),
-        ) : Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 17),
-            child: Icon(Icons.keyboard_arrow_down)
-        );
-      },
-      separatorBuilder: (ctx, index) => Divider(),
+        ),
+      ],
     );
   }
 
@@ -119,13 +163,14 @@ class PhotoPage extends StatelessWidget{
               ),
               isAndroid ? IconButton(
                   icon: Icon(Icons.send, color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
+                  padding: EdgeInsets.zero,
                   onPressed: () => tryComment(context, textEditingController.value.text)
               ) : Container()
             ],
           )
         ],
       ),
-      padding: EdgeInsets.fromLTRB(17, 0, isAndroid ? 2 : 17, 7),
+      padding: EdgeInsets.fromLTRB(17, 1, 17, 7),
     );
   }
 
@@ -138,6 +183,8 @@ class PhotoPage extends StatelessWidget{
         maxLines: 2,
         minLines: 1,
         controller: textEditingController,
+        enabled: isPanelOpen ? false : true,
+        focusNode: focusNode,
         decoration: buildRoundDecoration(
             hint,
             icon
@@ -156,19 +203,13 @@ class PhotoPage extends StatelessWidget{
             ),
             maxScale: 3.0,
             minScale: PhotoViewComputedScale.contained,
-            imageProvider: AdvancedNetworkImage(
-              url,
-              loadedCallback: () => print('Successfully loaded $url'),
-              loadFailedCallback: () => print('Failed to load $url'),
-              useDiskCache: true,
-              cacheRule: CacheRule(maxAge: Duration(days: 30)),
-            ),
+            imageProvider: MyImage(imgUrl: widget.url).buildProvider(context),
             heroAttributes: PhotoViewHeroAttributes(
-                tag: index == 0 ? cat : index.hashCode,
+                tag: widget.index == 0 ? widget.cat : widget.index.hashCode,
                 transitionOnUserGestures: true
             ),
           ),
-          onTap: () => closeKeyboard(),
+          onTap: () => closeKeyboardPanel(),
         ),
         Positioned(
             top: 10,
@@ -183,6 +224,11 @@ class PhotoPage extends StatelessWidget{
         StatusBarOverlay()
       ],
     );
+  }
+
+  void closeKeyboardPanel(){
+    panelController.close();
+    closeKeyboard();
   }
 
   void tryComment(BuildContext context, String str) async {
@@ -211,16 +257,16 @@ class PhotoPage extends StatelessWidget{
           },
           Strs.keyCommentContent: str,
           Strs.keyCreateTime: nowDIYTime(),
-          Strs.keyFileName : cat.img[index]
+          Strs.keyFileName : widget.cat.img[widget.index]
         },
         Strs.keyCommentPosition: {
           "is_comment": true,
-          Strs.keyCatId: cat.id,
+          Strs.keyCatId: widget.cat.id,
         }
       },
       success: (body) async {
         showToast(context, '评论成功', false);
-        Provider.of<CatProvider>(context).updateData(cat.id);
+        Provider.of<CatProvider>(context).updateData(widget.cat.id);
         final userData = await locator.getAsync<UserStore>();
         userData.lastCommentTime.put(nowTime.toString());
         textEditingController.clear();

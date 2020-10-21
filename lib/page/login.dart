@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
             Map<String, dynamic> jsonData = json.decode(body);
             _user.setNick(jsonData[Strs.keyUserName]);
             _user.setOpenId(jsonData[Strs.keyUserId]);
-            _user.setMsg(json.encode({'msg_list': json.encode(jsonData['msg'])}));
+            _user.setMsg(json.encode({'msg_list': jsonData['msg']}));
             Navigator.of(context).pop();
           },
           failed: (code) => print(code)

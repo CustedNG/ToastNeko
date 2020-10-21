@@ -28,6 +28,7 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
   UserProvider _user;
   bool _isChangingNick;
   bool loggedIn;
+  bool isPanelOpen = false;
   final panelBorder = BorderRadius.only(
     topLeft: Radius.circular(24.0),
     topRight: Radius.circular(24.0),
@@ -83,6 +84,8 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
       body: _buildScrollView(context),
       maxHeight: 377,
       minHeight: 77,
+      onPanelClosed: () => setState(() => isPanelOpen = false),
+      onPanelOpened: () => setState(() => isPanelOpen = true),
       collapsed: Container(
         decoration: BoxDecoration(
             color: Colors.blueGrey,
@@ -102,11 +105,11 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
                     children: [
                       !loggedIn
                           ? RoundBtn('登录', Colors.cyan, () =>
-                              AppRoute(LoginPage()).go(context))
-                          : RoundBtn('退出登录', Colors.redAccent, (){
-                            loggedIn = false;
-                            setState(() async => await _user.logout());
-                          }),
+                              isPanelOpen ? null : AppRoute(LoginPage()).go(context)
+                          )
+                          : RoundBtn('退出登录', Colors.redAccent, () =>
+                              isPanelOpen ? null : logout()
+                          ),
                       loggedIn
                           ? RoundBtn('修改昵称', Colors.cyan, () => _buildNickDialog(context))
                           : Container(),
@@ -131,26 +134,39 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
     );
   }
 
+  void logout() async{
+    loggedIn = false;
+    await _user.logout();
+    setState((){});
+  }
+
   Widget _buildMsgList(BuildContext context){
     final msgList = json.decode(_user.msg)['msg_list'];
-    final listLength = msgList.length + 2;
-    return ListView.builder(
-        itemCount: listLength,
-        itemBuilder: (context, index){
-          return index == 0
-              ? Padding(
-                  padding: EdgeInsets.fromLTRB(0, 7, 0, 60),
-                  child: Icon(Icons.keyboard_arrow_down)
-              )
-              : Center(
-                child: Padding(
-                    padding: EdgeInsets.all(17),
-                    child: msgList.length == 0
-                      ? Text('你当前没有任何消息(该功能开发中)')
-                      : (index == listLength - 1 ? Text('~~~') : Container())//_buildCommentItem(msgList, index - 1))
-                  )
-          );
-        }
+    final listLength = msgList.length + 1;
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 17, bottom: 27),
+          child: Icon(Icons.keyboard_arrow_down)
+        ),
+        SizedBox(
+          height: 300,
+          width: MediaQuery.of(context).size.width,
+          child: ListView.builder(
+              itemCount: listLength,
+              itemBuilder: (context, index){
+                return Center(
+                    child: Padding(
+                        padding: EdgeInsets.all(17),
+                        child: msgList.length == 0
+                            ? Text('你当前没有任何消息')
+                            : (index == listLength - 1 ? Text('~~~') : _buildCommentItem(msgList, index - 1))//
+                    )
+                );
+              }
+          ),
+        )
+      ],
     );
   }
 

@@ -23,8 +23,11 @@ class RoundBtn extends StatelessWidget{
           borderRadius: BorderRadius.all(Radius.circular(40.0)),
         ),
         clipBehavior: Clip.antiAlias,
-        child: MaterialButton(
-            child: Text(btnName), textColor: Colors.white, onPressed: onTap),
+        child: FlatButton(
+            child: Text(btnName),
+            textColor: Colors.white,
+            onPressed: onTap
+        ),
       ),
     );
   }

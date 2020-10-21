@@ -151,7 +151,6 @@ class _HomePageState extends State<HomePage>
                     SizedBox.expand(
                         child: MyImage(
                           imgUrl: Strs.baseImgUrl + catList[index].avatar,
-                          index: index,
                         )
                     ),
                     Positioned(

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
@@ -195,3 +196,6 @@ dynamic kv(dynamic dict, String key, [dynamic defaultValue = '']) =>
 
 void closeKeyboard() =>
     SystemChannels.textInput.invokeMethod('TextInput.hide');
+
+String buildCommentString(Comment comment, String between) =>
+    comment.nick + between + comment.content;
