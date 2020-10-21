@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
+import 'package:cat_gallery/model/error.dart';
 import 'package:cat_gallery/model/reply.dart';
 import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
@@ -37,6 +36,7 @@ class _PhotoPageState extends State<PhotoPage> {
   final PanelController panelController = PanelController();
   final boxShadow = BoxShadow(blurRadius: 48.0, color: Colors.black38);
   bool isPanelOpen = false;
+  String commentId;
   final FocusNode focusNode = FocusNode();
 
   @override
@@ -103,6 +103,7 @@ class _PhotoPageState extends State<PhotoPage> {
                         Text(comment.nick + ': ' + comment.content),
                         FlatButton(
                           onPressed: (){
+                            setState(() => commentId = comment.commentId);
                             panelController.close();
                             Future.delayed(Duration(milliseconds: 577), () => FocusScope.of(context).requestFocus(focusNode));
                           },
@@ -148,7 +149,6 @@ class _PhotoPageState extends State<PhotoPage> {
   }
 
   Widget _buildCollapsed(BuildContext context){
-    final isAndroid = Platform.isAndroid;
     return Padding(
       child: Column(
         children: [
@@ -161,11 +161,11 @@ class _PhotoPageState extends State<PhotoPage> {
               Expanded(
                 child: _buildTextField(context, true, '想说点什么？', icon: Icon(Icons.chat)),
               ),
-              isAndroid ? IconButton(
+              IconButton(
                   icon: Icon(Icons.send, color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
                   padding: EdgeInsets.zero,
                   onPressed: () => tryComment(context, textEditingController.value.text)
-              ) : Container()
+              )
             ],
           )
         ],
@@ -232,6 +232,7 @@ class _PhotoPageState extends State<PhotoPage> {
   }
 
   void tryComment(BuildContext context, String str) async {
+    final isComment = commentId == null;
     final userProvider = locator<UserStore>();
     if(!userProvider.loggedIn.fetch()){
       showShouldLoginDialog(context);
@@ -242,37 +243,41 @@ class _PhotoPageState extends State<PhotoPage> {
     final nowTime = DateTime.now();
     if(lastTime != null){
       if(nowTime.difference(DateTime.parse(lastTime)).inSeconds < 30){
-        showWrongDialog(context, '每次上报评论间隔不小于三十秒');
+        showWrongDialog(context, '每次评论间隔不小于三十秒');
         return;
       }
     }
 
-    await Request().go(
-      'post',
-      Strs.userComment,
-      data: {
-        Strs.keyCommentContent: {
-          Strs.keyUserInfo: {
-            Strs.keyUserId: userProvider.openId.fetch(),
+    try{
+      await Request().go(
+          'post',
+          Strs.userComment,
+          data: {
+            Strs.keyCommentContent: {
+              Strs.keyUserInfo: {
+                Strs.keyUserId: userProvider.openId.fetch(),
+              },
+              Strs.keyCommentContent: str,
+              Strs.keyCreateTime: nowDIYTime(),
+              Strs.keyFileName : widget.cat.img[widget.index]
+            },
+            Strs.keyCommentPosition: {
+              "is_comment": isComment,
+              Strs.keyCatId: widget.cat.id,
+            }
           },
-          Strs.keyCommentContent: str,
-          Strs.keyCreateTime: nowDIYTime(),
-          Strs.keyFileName : widget.cat.img[widget.index]
-        },
-        Strs.keyCommentPosition: {
-          "is_comment": true,
-          Strs.keyCatId: widget.cat.id,
-        }
-      },
-      success: (body) async {
-        showToast(context, '评论成功', false);
-        Provider.of<CatProvider>(context).updateData(widget.cat.id);
-        final userData = await locator.getAsync<UserStore>();
-        userData.lastCommentTime.put(nowTime.toString());
-        textEditingController.clear();
-        closeKeyboard();
-      },
-      failed: (code) => showWrongToast(context, code)
-    );
+          success: (body) async {
+            showToast(context, '评论成功', false);
+            Provider.of<CatProvider>(context).updateData(widget.cat.id);
+            final userData = await locator.getAsync<UserStore>();
+            userData.lastCommentTime.put(nowTime.toString());
+            textEditingController.clear();
+            closeKeyboard();
+          }
+      );
+    }catch(e){
+      final error = e.toString();
+      showWrongToastByCode(context, error, commentError);
+    }
   }
 }

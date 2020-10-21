@@ -36,8 +36,7 @@ Future<void> initCatData([String nekoId]) async {
       success: (value) async {
         jsonData = json.decode(value);
         catStore.allCats.put(json.encode(jsonData));
-      },
-      failed: (code) => print(code)
+      }
   );
 }
 
@@ -48,8 +47,7 @@ Future<void> initSpecificCatData(String nekoId, CatStore catStore) async {
       data: {'neko_id': nekoId},
       success: (value) async {
         catStore.put(nekoId, value);
-      },
-      failed: (code) => print(code)
+      }
   );
 }
 
@@ -199,3 +197,9 @@ void closeKeyboard() =>
 
 String buildCommentString(Comment comment, String between) =>
     comment.nick + between + comment.content;
+
+void showWrongToastByCode(BuildContext context, String error, Map<String, String> errorDict){
+  errorDict.forEach((code, prompt){
+    if(error.contains(code))showWrongToast(context, prompt);
+  });
+}

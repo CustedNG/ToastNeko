@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/model/error.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:flutter/material.dart';
@@ -61,12 +62,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       final issue = e.toString();
-      if(issue.contains('400'))showWrongToast(context, '登录失败，数据不合法');
-      if(issue.contains('422'))showWrongToast(context, '登录失败，请检查账号密码');
-      if(issue.contains('450'))showWrongToast(context, '登录失败，请先使用手机号注册教务');
-      if(issue.contains('510'))showWrongToast(context, '登录失败，教务出现问题，无法验证');
-      if(issue.contains('511'))showWrongToast(context, '登录失败，后端错误，查询失败');
-      if(issue.contains('512'))showWrongToast(context, '登录失败，后端错误，注册失败');
+      showWrongToastByCode(context, issue, loginError);
       rethrow;
     } finally {
       setState(() => _isBusy = false);
