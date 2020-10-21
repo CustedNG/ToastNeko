@@ -102,6 +102,12 @@ class _PhotoPageState extends State<PhotoPage> {
                       children: [
                         Text(comment.nick + ': ' + comment.content),
                         FlatButton(
+                          onPressed: () => tryDelComment(comment.commentId),
+                          child: Text('删除'),
+                          padding: EdgeInsets.all(1),
+                          minWidth: 37,
+                        ),
+                        FlatButton(
                           onPressed: (){
                             setState(() => commentId = comment.commentId);
                             panelController.close();
@@ -109,7 +115,7 @@ class _PhotoPageState extends State<PhotoPage> {
                           },
                           child: Text('回复'),
                           padding: EdgeInsets.all(1),
-                          minWidth: 47,
+                          minWidth: 37,
                         )
                       ],
                     ),
@@ -278,5 +284,9 @@ class _PhotoPageState extends State<PhotoPage> {
     }catch(e){
       showWrongToastByCode(context, e.toString(), commentError);
     }
+  }
+
+  void tryDelComment(String commentId) {
+
   }
 }

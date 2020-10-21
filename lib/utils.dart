@@ -110,8 +110,7 @@ Future<void> getUserMsg(BuildContext context) async {
     },
     success: (data){
       user.setMsg(data);
-    },
-    failed: (code) => showWrongToast(context, code)
+    }
   ) : print('还未登录');
 }
 
