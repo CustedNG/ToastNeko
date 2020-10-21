@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/model/error.dart';
 import 'package:cat_gallery/page/intro.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
@@ -312,21 +313,24 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
       return;
     }
     
-    await Request().go(
-        'put',
-        Strs.userChangeNick,
-        data: {
-          Strs.keyUserId : _user.openId,
-          Strs.keyUserName : _nickController.value.text
-        },
-        success: (data){
-          _user.setNick(_nickController.value.text);
-          Navigator.of(context).pop();
-          _nickController.clear();
-          showToast(context, '修改昵称成功', false);
-        },
-        failed: (code) => showToast(context, '错误码 $code', false)
-    );
+    try{
+      await Request().go(
+          'put',
+          Strs.userChangeNick,
+          data: {
+            Strs.keyUserId : _user.openId,
+            Strs.keyUserName : _nickController.value.text
+          },
+          success: (data){
+            _user.setNick(_nickController.value.text);
+            Navigator.of(context).pop();
+            _nickController.clear();
+            showToast(context, '修改昵称成功', false);
+          }
+      );
+    }catch(e){
+      showWrongToastByCode(context, e.toString(), nickError);
+    }
     _isChangingNick = false;
   }
 

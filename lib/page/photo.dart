@@ -276,8 +276,7 @@ class _PhotoPageState extends State<PhotoPage> {
           }
       );
     }catch(e){
-      final error = e.toString();
-      showWrongToastByCode(context, error, commentError);
+      showWrongToastByCode(context, e.toString(), commentError);
     }
   }
 }

@@ -57,8 +57,7 @@ class _LoginPageState extends State<LoginPage> {
             _user.setOpenId(jsonData[Strs.keyUserId]);
             _user.setMsg(json.encode({'msg_list': jsonData['msg']}));
             Navigator.of(context).pop();
-          },
-          failed: (code) => print(code)
+          }
       );
     } catch (e) {
       final issue = e.toString();

@@ -5,7 +5,7 @@ class Request {
   Dio dio = Dio();
 
   Future<void> go(String method, String url,
-      {dynamic data, Function success, Function failed}) async {
+      {dynamic data, Function success}) async {
     switch(method){
       case 'get':
         response = await dio.get(url, queryParameters: data);
@@ -24,11 +24,9 @@ class Request {
         break;
     }
 
-    if(response.statusCode == 200){
-      if(success != null)success(response.toString());
-    }else{
-      if(failed != null)failed(response.statusCode);
-    }
+
+    if(success != null)success(response.toString());
+
     print('${response.request.uri.toString()}\n'
         '${response.statusCode}\n'
         '${response.toString()}');

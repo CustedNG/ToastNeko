@@ -6,6 +6,7 @@ import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/ge.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/locator.dart';
+import 'package:cat_gallery/model/error.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
@@ -136,33 +137,36 @@ class _TimelinePageState extends State<TimelinePage> {
       }
     }
 
-    await Request().go(
-        'put',
-        Strs.publicManagePosition,
-        data: {
-          'neko_id': widget.catId,
-          'position': {
-            'location': textValue1,
-            'time': nowDIYTime(),
-            'duration': 0,
-            'nick': _user.nick,
-            'msg': textValue2,
-            'open_id': _user.openId
+    try{
+      await Request().go(
+          'put',
+          Strs.publicManagePosition,
+          data: {
+            'neko_id': widget.catId,
+            'position': {
+              'location': textValue1,
+              'time': nowDIYTime(),
+              'duration': 0,
+              'nick': _user.nick,
+              'msg': textValue2,
+              'open_id': _user.openId
+            }
+          },
+          success: (body) async {
+            await initSpecificCatData(widget.catId, _catStore);
+            setState(() {
+              initData();
+              _isUploading = false;
+              _textFieldController.clear();
+              _textFieldController2.clear();
+              _user.setLastFeedbackTime(nowTime.toString());
+              Navigator.of(context).pop();
+            });
           }
-        },
-        success: (body) async {
-          await initSpecificCatData(widget.catId, _catStore);
-          setState(() {
-            initData();
-            _isUploading = false;
-            _textFieldController.clear();
-            _textFieldController2.clear();
-            _user.setLastFeedbackTime(nowTime.toString());
-            Navigator.of(context).pop();
-          });
-        },
-        failed: (code) => print(code)
-    );
+      );
+    }catch(e){
+      showWrongToastByCode(context, e.toString(), positionError);
+    }
   }
 
   void _showAddDialog(){
