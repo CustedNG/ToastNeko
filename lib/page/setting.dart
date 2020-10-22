@@ -147,21 +147,22 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 17, bottom: 27),
+          padding: EdgeInsets.only(top: 17, bottom: 37),
           child: Icon(Icons.keyboard_arrow_down)
         ),
         SizedBox(
-          height: 300,
+          height: 299,
           width: MediaQuery.of(context).size.width,
           child: ListView.builder(
+            physics: BouncingScrollPhysics(),
               itemCount: listLength,
               itemBuilder: (context, index){
                 return Center(
                     child: Padding(
-                        padding: EdgeInsets.all(17),
+                        padding: EdgeInsets.fromLTRB(37, 17, 37, 17),
                         child: msgList.length == 0
                             ? Text('你当前没有任何消息')
-                            : (index == listLength - 1 ? Text('~~~') : _buildCommentItem(msgList, index - 1))//
+                            : (index == listLength - 1 ? Text('~~~') : _buildCommentItem(msgList, index))//
                     )
                 );
               }
@@ -176,13 +177,13 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(msgList[index].nick + '回复了你: '),
+        Text(msgList[index]['neko_id'] + '回复了你: '),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(msgList[index].content)
+            Text(msgList[index]['create_time'])
           ],
         )
       ],

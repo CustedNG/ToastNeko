@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -113,6 +114,11 @@ Future<void> getUserMsg(BuildContext context) async {
       user.setMsg(data);
     }
   ) : print('还未登录');
+}
+
+void autoUpdateUserMsg(BuildContext context){
+  getUserMsg(context);
+  Timer.periodic(Duration(seconds: 77), (_) => getUserMsg(context));
 }
 
 void unawaited(Future<void> future) {}

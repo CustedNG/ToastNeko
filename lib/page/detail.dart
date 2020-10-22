@@ -77,6 +77,7 @@ class _DetailPageState extends State<DetailPage> with AutomaticKeepAliveClientMi
           for(dynamic reply in json.decode(ele.reply)){
             _replyList.add(
                 Reply(
+                    ele.commentId,
                     reply[Strs.keyReplyId],
                     reply[Strs.keyCommentContent],
                     reply[Strs.keyUserInfo][Strs.keyUserId],
