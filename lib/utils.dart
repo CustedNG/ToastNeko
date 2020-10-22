@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cat_gallery/core/request.dart';
-import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/model/comment.dart';
+import 'package:cat_gallery/model/reply.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
@@ -196,6 +197,9 @@ void closeKeyboard() =>
 
 String buildCommentString(Comment comment, String between) =>
     comment.nick + between + comment.content;
+
+String buildReplyString(Reply reply, String between) =>
+    reply.nick + between + reply.content;
 
 void showWrongToastByCode(BuildContext context, String error, Map<String, String> errorDict){
   errorDict.forEach((code, prompt){

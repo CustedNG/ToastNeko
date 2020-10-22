@@ -53,6 +53,7 @@ class Strs{
   static const String keyReply = 'reply';
   static const String keyReplyId = 'reply_id';
   static const String keyIsReply = 'is_reply';
+  static const String keyIsComment = 'is_comment';
   static const String keyCreateTime = 'create_time';
   static const String keyFileName = 'file_name';
 

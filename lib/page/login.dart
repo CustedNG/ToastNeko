@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
-import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/model/error.dart';
 import 'package:cat_gallery/utils.dart';

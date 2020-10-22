@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
-import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/data/user_provider.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/error.dart';
@@ -264,20 +264,18 @@ class _TimelineActivity extends StatelessWidget {
           leftChild = _LeftChildTimeline(step: step);
         }
 
-        return FadeIn(
-          child: TimelineTile(
-            alignment: TimelineAlign.manual,
-            isFirst: index == 0,
-            isLast: index == steps.length - 1,
-            lineXY: 0.15,
-            indicatorStyle: indicator,
-            startChild: leftChild,
-            endChild: rightChild,
-            hasIndicator: step.isCheckpoint,
-            beforeLineStyle: LineStyle(
-              color: step.color,
-              thickness: 8,
-            ),
+        return TimelineTile(
+          alignment: TimelineAlign.manual,
+          isFirst: index == 0,
+          isLast: index == steps.length - 1,
+          lineXY: 0.2,
+          indicatorStyle: indicator,
+          startChild: leftChild,
+          endChild: rightChild,
+          hasIndicator: step.isCheckpoint,
+          beforeLineStyle: LineStyle(
+            color: step.color,
+            thickness: 8,
           ),
         );
       },
@@ -317,26 +315,28 @@ class _RightChildTimeline extends StatelessWidget {
     final double minHeight =
     step.isCheckpoint ? 100 : step.duration.toDouble() * 8;
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(minHeight: minHeight),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+    return BounceInLeft(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: minHeight),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
 
-          Padding(
-            padding: EdgeInsets.only(
-                left: step.isCheckpoint ? 20 : 39,
-                top: 8,
-                bottom: 8,
-                right: 8),
-            child: Text(
-              step.type == Type.checkpoint
-                  ? '${step.message}'
-                  : step.message ?? '',
+            Padding(
+                padding: EdgeInsets.only(
+                    left: step.isCheckpoint ? 20 : 39,
+                    top: 8,
+                    bottom: 8,
+                    right: 8),
+                child: Text(
+                  step.type == Type.checkpoint
+                      ? '${step.message}'
+                      : step.message ?? '',
+                )
             )
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

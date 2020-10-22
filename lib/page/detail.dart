@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
-import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/model/reply.dart';
 import 'package:cat_gallery/page/info.dart';
 import 'package:cat_gallery/model/cat.dart';

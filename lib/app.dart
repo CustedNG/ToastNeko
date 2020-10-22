@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/page/home.dart';
 import 'package:cat_gallery/page/setting.dart';
 import 'package:cat_gallery/model/navigation_item.dart';

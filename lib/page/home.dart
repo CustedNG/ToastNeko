@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:blurrycontainer/blurrycontainer.dart';
-import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/page/intro.dart';
 import 'package:cat_gallery/route.dart';

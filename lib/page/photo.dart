@@ -1,6 +1,9 @@
+import 'dart:io';
+
+import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/cat_provider.dart';
-import 'package:cat_gallery/data/ge.dart';
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:cat_gallery/model/comment.dart';
@@ -37,6 +40,7 @@ class _PhotoPageState extends State<PhotoPage> {
   final boxShadow = BoxShadow(blurRadius: 48.0, color: Colors.black38);
   bool isPanelOpen = false;
   String commentId;
+  String replyWho;
   final FocusNode focusNode = FocusNode();
 
   @override
@@ -45,7 +49,7 @@ class _PhotoPageState extends State<PhotoPage> {
       body: SlidingUpPanel(
         controller: panelController,
         body: _buildBody(context),
-        collapsed: _buildContainer(context, _buildCollapsed(context)),
+        collapsed: ElasticInDown(child: _buildContainer(context, _buildCollapsed(context))),
         panel: _buildContainer(context, _buildPanel(context)),
         minHeight: 107,
         maxHeight: 337,
@@ -88,69 +92,83 @@ class _PhotoPageState extends State<PhotoPage> {
             physics: BouncingScrollPhysics(),
             itemCount: widget.commentList.length,
             itemBuilder: (ctx, index){
-              final fontSize = Theme.of(context).textTheme.bodyText2.fontSize;
-              final comment = widget.commentList[index];
-              final List<Comment> replyList = [];
-              final replyLength = replyList.length + 1;
-              final commentNameWidth = comment.nick.length * fontSize / 2;
-              return Padding(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(comment.nick + ': ' + comment.content),
-                        FlatButton(
-                          onPressed: () => tryDelComment(comment.commentId),
-                          child: Text('删除'),
-                          padding: EdgeInsets.all(1),
-                          minWidth: 37,
-                        ),
-                        FlatButton(
-                          onPressed: (){
-                            setState(() => commentId = comment.commentId);
-                            panelController.close();
-                            Future.delayed(Duration(milliseconds: 577), () => FocusScope.of(context).requestFocus(focusNode));
-                          },
-                          child: Text('回复'),
-                          padding: EdgeInsets.all(1),
-                          minWidth: 37,
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 7),
-                    replyLength == 1 ? Container() : ExpandChild(
-                      arrowSize: 23,
-                      expandedHint: '收起',
-                      collapsedHint: '展开',
-                      expandArrowStyle: ExpandArrowStyle.both,
-                      arrowPadding: EdgeInsets.zero,
-                      child: Row(
-                        children: [
-                          SizedBox(width: commentNameWidth),
-                          SizedBox(
-                            height: fontSize * replyLength * 1.35,
-                            width: MediaQuery.of(context).size.width - commentNameWidth - 34,
-                            child: ListView.builder(
-                              itemCount: replyLength,
-                              itemBuilder: (ctx, index){
-                                return Text(buildCommentString(replyList[index], ': '));
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                padding: EdgeInsets.fromLTRB(17, 0, 17, 0),
-              );
+              return _buildCommentItem(index);
             },
             separatorBuilder: (ctx, index) => Divider(),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCommentItem(int index){
+    final fontSize = Theme.of(context).textTheme.bodyText2.fontSize;
+    final comment = widget.commentList[index];
+    final List<Reply> replyList = [];
+    final replyLength = replyList.length + 1;
+    final commentNameWidth = comment.nick.length * fontSize / 2;
+    return Padding(
+      child: FlatButton(
+        onPressed: () => null,
+        onLongPress: () => tryDelComment(comment.commentId, false),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(comment.nick + ': ' + comment.content, overflow: TextOverflow.fade),
+                FlatButton(
+                  onPressed: (){
+                    setState((){
+                      commentId = comment.commentId;
+                      replyWho = comment.nick;
+                    });
+                    panelController.close();
+                    Future.delayed(Duration(milliseconds: 577), () => FocusScope.of(context).requestFocus(focusNode));
+                  },
+                  child: Text('回复'),
+                  padding: EdgeInsets.all(1),
+                  minWidth: 37,
+                )
+              ],
+            ),
+            replyLength == 1 ? Container() : SizedBox(height: 7),
+            replyLength == 1 ? Container() : ExpandChild(
+              arrowSize: 23,
+              expandedHint: '收起',
+              collapsedHint: '展开',
+              expandArrowStyle: ExpandArrowStyle.both,
+              arrowPadding: EdgeInsets.zero,
+              child: Row(
+                children: [
+                  SizedBox(width: commentNameWidth),
+                  SizedBox(
+                    height: fontSize * replyLength * 1.35,
+                    width: MediaQuery.of(context).size.width - commentNameWidth - 34,
+                    child: ListView.builder(
+                      itemCount: replyLength,
+                      itemBuilder: (ctx, index){
+                        return _buildReplyItem(index, replyList);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(17, 0, 17, 0),
+    );
+  }
+
+  Widget _buildReplyItem(int index, List<Reply> replyList){
+    return FlatButton(
+      padding: EdgeInsets.all(0),
+      child: Text(buildReplyString(replyList[index], ': ')),
+      onPressed: () => print(commentId),
+      onLongPress: () => tryDelComment(replyList[index].replyId, false),
     );
   }
 
@@ -165,13 +183,18 @@ class _PhotoPageState extends State<PhotoPage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: _buildTextField(context, true, '想说点什么？', icon: Icon(Icons.chat)),
+                child: _buildTextField(
+                    context,
+                    true,
+                    commentId == null ? '想说点什么？' : '回复$replyWho',
+                    icon: commentId == null ? Icon(Icons.chat) : Icon(Icons.reply)
+                ),
               ),
-              IconButton(
+              Platform.isAndroid ? IconButton(
                   icon: Icon(Icons.send, color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
                   padding: EdgeInsets.zero,
                   onPressed: () => tryComment(context, textEditingController.value.text)
-              )
+              ) : Container()
             ],
           )
         ],
@@ -267,13 +290,18 @@ class _PhotoPageState extends State<PhotoPage> {
               Strs.keyCreateTime: nowDIYTime(),
               Strs.keyFileName : widget.cat.img[widget.index]
             },
-            Strs.keyCommentPosition: {
-              "is_comment": isComment,
+            Strs.keyCommentPosition: isComment ? {
+              Strs.keyIsComment: true,
               Strs.keyCatId: widget.cat.id,
+            } : {
+              Strs.keyIsComment: false,
+              Strs.keyCatId: widget.cat.id,
+              Strs.keyCommentID: commentId,
+              Strs.keyUserId: locator<UserStore>().openId.fetch()
             }
           },
           success: (body) async {
-            showToast(context, '评论成功', false);
+            showToast(context, isComment ? '评论成功' : '回复成功', false);
             Provider.of<CatProvider>(context).updateData(widget.cat.id);
             final userData = await locator.getAsync<UserStore>();
             userData.lastCommentTime.put(nowTime.toString());
@@ -286,7 +314,7 @@ class _PhotoPageState extends State<PhotoPage> {
     }
   }
 
-  void tryDelComment(String commentId) {
-
+  void tryDelComment(String commentId, bool isComment) {
+    print(this.commentId);
   }
 }
