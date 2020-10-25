@@ -1,3 +1,4 @@
+import 'package:cat_gallery/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_networkimage/transition.dart';
 import 'package:flutter_advanced_networkimage/zoomable.dart';
@@ -39,8 +40,7 @@ class PhotoViewMap extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             TransitionToImage(
-              image: map.image,
-              // image: isDark ? map.darkImage : map.image,
+              image: isDarkMode(context) ? map.darkImage : map.image,
               // placeholder: CircularProgressIndicator(),
               placeholder: Container(),
               duration: Duration(milliseconds: 300),
