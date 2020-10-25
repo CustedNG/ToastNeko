@@ -315,7 +315,7 @@ class _RightChildTimeline extends StatelessWidget {
     final double minHeight =
     step.isCheckpoint ? 100 : step.duration.toDouble() * 8;
 
-    return BounceInLeft(
+    return BounceInRight(
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: minHeight),
         child: Column(

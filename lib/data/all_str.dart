@@ -1,10 +1,10 @@
 class Strs{
   //version
-  static const int versionCode = 5;
+  static const int versionCode = 10;
 
   //url
   static const String baseUrl = 'https://neko.lacus.site';
-  static const String apiVersion = 'dev';
+  static const String apiVersion = 'v1';
   static const String baseApiUrl = baseUrl + '/' + apiVersion;
   static const String baseImgUrl = baseApiUrl + '/images/';
   static const String baseUserApiUrl = baseApiUrl + '/user';
@@ -70,6 +70,7 @@ class Strs{
   static const String photoWrongSolution = '如果图片显示错误，请清除所有数据。';
   static const String helpText1 = '首页上下滑动，点击查看图片。';
   static const String loginToast = '账户密码为教务账户与密码\n我们不搜集信息\n登录仅供验证是否为理工学生';
+  static const List<String> diedCats = ['鸡腿', '跳跳'];
 
   //asset
   static const String custMapW = 'assets/map/CustW.png';
@@ -79,7 +80,4 @@ class Strs{
   static const String custMapDarkE = 'assets/map/Dark-CustE.png';
   static const String custMapDarkS = 'assets/map/Dark-CustS.png';
   static const String bannerToastNeko = 'assets/toast_neko.png';
-
-  //error
-  static const String noRequestData = 'no request data';
 }

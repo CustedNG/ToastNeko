@@ -133,6 +133,7 @@ class _HomePageState extends State<HomePage>
 
   Widget _buildList(BuildContext context, int index, double height, double width){
     _scale = 1 - _curvedAnimation.value;
+    final catName = catList[index].displayName;
     return Padding(
         padding: EdgeInsets.all(_padding),
         child: Hero(
@@ -171,7 +172,10 @@ class _HomePageState extends State<HomePage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              catList[index].displayName,
+                              (Strs.diedCats.contains(catName))
+                                  ? catName + '  RIP🙏'
+                                  : catName
+                              ,
                               textScaleFactor: 1.0,
                               style: TextStyle(color: Colors.white, fontSize: 23),
                             ),

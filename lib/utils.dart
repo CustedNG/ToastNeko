@@ -118,7 +118,19 @@ Future<void> getUserMsg(BuildContext context) async {
 
 void autoUpdateUserMsg(BuildContext context){
   getUserMsg(context);
-  Timer.periodic(Duration(seconds: 77), (_) => getUserMsg(context));
+  Timer.periodic(Duration(seconds: 27), (_) => getUserMsg(context));
+}
+
+Future<void> clearUserMsg(BuildContext context) async {
+  final user = Provider.of<UserProvider>(context);
+  await Request().go(
+    'delete',
+    Strs.userClearNotification,
+    data: {
+      Strs.keyUserId: user.openId
+    },
+    success: (data) => user.clearMsg()
+  );
 }
 
 void unawaited(Future<void> future) {}

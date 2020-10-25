@@ -37,6 +37,7 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
 
   final _nickController = TextEditingController();
   final _nickFocusNode = FocusNode();
+  final _panelController = PanelController();
 
   @override
   void initState() {
@@ -85,6 +86,7 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
       body: _buildScrollView(context),
       maxHeight: 377,
       minHeight: 77,
+      controller: _panelController,
       onPanelClosed: () => setState(() => isPanelOpen = false),
       onPanelOpened: () => setState(() => isPanelOpen = true),
       collapsed: Container(
@@ -142,7 +144,7 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
   }
 
   Widget _buildMsgList(BuildContext context){
-    final msgList = json.decode(_user.msg)['msg_list'];
+    var msgList = json.decode(_user.msg)['msg_list'];
     final listLength = msgList.length + 1;
     return Column(
       children: [
@@ -162,7 +164,16 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
                         padding: EdgeInsets.fromLTRB(37, 17, 37, 17),
                         child: msgList.length == 0
                             ? Text('你当前没有任何消息')
-                            : (index == listLength - 1 ? Text('~~~') : _buildCommentItem(msgList, index))//
+                            : (index == listLength - 1
+                              ? RoundBtn('清空消息', Colors.cyan, () {
+                                  clearUserMsg(context);
+                                  setState(() {
+                                    msgList = [];
+                                  });
+                                  showToast(context, '清空完成', false);
+                                  Future.delayed(Duration(seconds: 1), () => _panelController.close());
+                                })
+                              : _buildCommentItem(msgList, index))//
                     )
                 );
               }
@@ -240,7 +251,7 @@ class _SettingPageState extends State<SettingPage> with TickerProviderStateMixin
                 bottom: 5,
                 right: 8,
                 child: Text(
-                  'Ver: Beta 0.' + Strs.versionCode.toString(),
+                  'Ver ' + Strs.versionCode.toString(),
                   style: bannerTextStyle,
                 )
             )
