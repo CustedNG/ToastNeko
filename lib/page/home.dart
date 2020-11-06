@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage>
 
 
     nekoList.forEach((cat){
+      //TODO: 等英博改完后端用新的的解析方式
       Map<String, dynamic> catJson = json.decode(catStore.fetch(cat[Strs.keyCatId]));
       List<String> imgs = [];
       catJson[Strs.keyCatImg].forEach((url) => imgs.add(url));
@@ -173,7 +174,7 @@ class _HomePageState extends State<HomePage>
                           children: <Widget>[
                             Text(
                               (Strs.diedCats.contains(catName))
-                                  ? catName + '  RIP🙏'
+                                  ? catName + '  RIP'
                                   : catName
                               ,
                               textScaleFactor: 1.0,
@@ -185,7 +186,7 @@ class _HomePageState extends State<HomePage>
                                   '${catList[index].sex == '未知'
                                   ? '未知性别' : catList[index].sex + '孩子'}',
                               textScaleFactor: 1.0,
-                              style: TextStyle(color: Colors.grey, fontSize: 19),
+                              style: TextStyle(color: Colors.white70, fontSize: 17),
                             )
                           ],
                         )

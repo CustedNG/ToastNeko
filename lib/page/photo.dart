@@ -266,6 +266,11 @@ class _PhotoPageState extends State<PhotoPage> {
       return;
     }
 
+    if(!isInputNotRubbish([textEditingController], 20, 1)){
+      showWrongDialog(context, '输入字数不得小于1大于20');
+      return;
+    }
+
     final lastTime = userProvider.lastCommentTime.fetch();
     final nowTime = DateTime.now();
     if(lastTime != null){

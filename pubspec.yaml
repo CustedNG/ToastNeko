@@ -53,5 +53,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/toast_neko.png
+    - assets/prize_ribbon.png
     - assets/map/
     - assets/intro/
