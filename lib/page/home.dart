@@ -3,19 +3,18 @@ import 'dart:convert';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/locator.dart';
+import 'package:cat_gallery/model/cat.dart';
+import 'package:cat_gallery/page/detail.dart';
 import 'package:cat_gallery/page/intro.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/custom_image.dart';
+import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:cat_gallery/widget/status_bar_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'detail.dart';
-import '../model/cat.dart';
-import '../widget/round_shape.dart';
 
 class HomePage extends StatefulWidget{
   @override
@@ -174,7 +173,7 @@ class _HomePageState extends State<HomePage>
                           children: <Widget>[
                             Text(
                               (Strs.diedCats.contains(catName))
-                                  ? catName + '  RIP'
+                                  ? catName + '  🙏'
                                   : catName
                               ,
                               textScaleFactor: 1.0,

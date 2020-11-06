@@ -43,13 +43,13 @@ class PrizePage extends StatelessWidget {
               ),
               RichText(
                   text: TextSpan(
-                      text: '查看图片:',
+                      text: '『Toast neko 兑粮带』',
                       style: TextStyle(
                           color: Theme.of(context).textTheme.bodyText1.color
                       ),
                       children: [
                         TextSpan(
-                          text: '『Toast neko 兑粮带』',
+                          text: '长啥样？',
                           style: TextStyle(color: Colors.cyan),
                           recognizer: TapGestureRecognizer()..onTap=() =>
                               AppRoute(SinglePhotoPage()).go(context)
