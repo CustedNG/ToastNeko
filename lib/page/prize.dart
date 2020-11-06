@@ -20,16 +20,16 @@ class PrizePage extends StatelessWidget {
           centerTitle: true,
         ),
         body: Padding(
-          padding: EdgeInsets.only(left: 20, right: 20, top: 30),
+          padding: EdgeInsets.only(left: 40, right: 40, top: 30, bottom: 30),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('你的兑奖码'),
               Text(
-                  _user.loggedIn
-                  ? base64Encode(utf8.encode(_user.openId.replaceFirst('2020', '0202')))
-                  : '请先登录'
+                _user.loggedIn
+                  ? '兑奖码: ' + base64Encode(utf8.encode(_user.openId.replaceFirst('2020', '0202')))
+                  : '请先登录',
+                style: TextStyle(fontSize: 17),
               ),
-              SizedBox(height: 37),
               Text(
                   '如何获得:\n'
                       '我们分为线上和线下两种途径:\n'
@@ -56,7 +56,7 @@ class PrizePage extends StatelessWidget {
                         ),
                       ]
                   )
-              )
+              ),
             ],
           ),
         )
