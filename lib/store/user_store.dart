@@ -14,5 +14,6 @@ class UserStore with PresistentStore {
   StoreProperty<bool> get savePassword =>
       property('savePassword', defaultValue: false);
   StoreProperty<bool> get haveInit => property('init', defaultValue: false);
+  StoreProperty<bool> get isAdmin => property('isAdmin', defaultValue: false);
   StoreProperty<bool> get loggedIn => property('loggedIn', defaultValue: false);
 }

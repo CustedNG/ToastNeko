@@ -71,7 +71,9 @@ class _HomePageState extends State<HomePage>
     checkVersion(context);
 
     Future.delayed(Duration(seconds: 2), (){
-      if(!locator<UserStore>().haveInit.fetch()){
+      UserStore userStore = locator<UserStore>();
+      if(!userStore.haveInit.fetch()){
+        userStore.haveInit.put(true);
         showRoundDialog(
             context,
             '提示',
@@ -81,13 +83,13 @@ class _HomePageState extends State<HomePage>
                 onPressed: () {
                   Navigator.pop(context);
                   AppRoute(IntroScreen()).go(context);
-                  },
+                },
                 child: Text('是'),
               ),
               FlatButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  },
+                },
                 child: Text('否'),
               )
             ],

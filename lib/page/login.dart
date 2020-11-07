@@ -38,7 +38,11 @@ class _LoginPageState extends State<LoginPage> {
     final username = _usernameController.value.text;
     final password = _passwordController.value.text;
 
-
+    if(!isInputNotRubbish([_usernameController], 10, 10)){
+      showWrongDialog(context, '用户名长度为10位');
+      _isBusy = false;
+      return;
+    }
 
     try {
       await Request().go(
@@ -55,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
             Map<String, dynamic> jsonData = json.decode(body);
             _user.setNick(jsonData[Strs.keyUserName]);
             _user.setOpenId(jsonData[Strs.keyUserId]);
+            _user.setIsAdmin(jsonData[Strs.keyUserIsAdmin]);
             _user.setMsg(json.encode({'msg_list': jsonData['msg']}));
             Navigator.of(context).pop();
           }

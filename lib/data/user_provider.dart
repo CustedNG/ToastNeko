@@ -7,6 +7,7 @@ import 'package:cat_gallery/utils.dart';
 
 class UserProvider extends BusyProvider {
   bool _loggedIn = false;
+  bool _isAdmin = false;
   String _nick;
   String _lastCommentTime;
   String _lastFeedbackTime;
@@ -16,6 +17,7 @@ class UserProvider extends BusyProvider {
   String _cid;
 
   bool get loggedIn => _loggedIn;
+  bool get isAdmin => _isAdmin;
   String get nick => _nick;
   String get lastCommentTime => _lastCommentTime;
   String get lastFeedbackTime => _lastFeedbackTime;
@@ -99,6 +101,12 @@ class UserProvider extends BusyProvider {
     _msg = '{"msg_list":[]}';
     final userData = await locator.getAsync<UserStore>();
     unawaited(userData.msg.put('{"msg_list":[]}'));
+  }
+
+  Future<void> setIsAdmin(bool isAdmin) async {
+    _isAdmin = isAdmin;
+    final userData = await locator.getAsync<UserStore>();
+    unawaited(userData.isAdmin.put(isAdmin));
   }
 
   Future<void> _setLoginState(bool state) async {

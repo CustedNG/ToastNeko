@@ -132,6 +132,24 @@ class Maps {
         Offset(32, 42),
         Offset(17, 37),
       ),
+      PhotoViewMap(
+        '东区操场',
+        custE,
+        Offset(32, 42),
+        Offset(17, 37),
+      ),
+      PhotoViewMap(
+        '东区东配',
+        custE,
+        Offset(68, 27),
+        Offset(7, 53),
+      ),
+      PhotoViewMap(
+        '东区三教',
+        custE,
+        Offset(32, 17),
+        Offset(13, 57),
+      ),
     ];
 
     for (final map in _maps) {

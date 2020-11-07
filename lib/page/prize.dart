@@ -20,7 +20,7 @@ class PrizePage extends StatelessWidget {
           centerTitle: true,
         ),
         body: Padding(
-          padding: EdgeInsets.only(left: 40, right: 40, top: 30, bottom: 30),
+          padding: EdgeInsets.only(left: 27, right: 27, top: 30, bottom: 30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

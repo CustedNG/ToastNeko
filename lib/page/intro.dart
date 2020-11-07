@@ -1,5 +1,3 @@
-import 'package:cat_gallery/locator.dart';
-import 'package:cat_gallery/store/user_store.dart';
 import 'package:flutter/material.dart';
 import 'package:intro_slider/intro_slider.dart';
 import 'package:intro_slider/slide_object.dart';
@@ -43,7 +41,6 @@ class _IntroScreenState extends State<IntroScreen> {
   }
 
   void onDonePress() {
-    locator<UserStore>().haveInit.put(true);
     Navigator.pop(context);
   }
 

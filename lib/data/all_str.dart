@@ -1,6 +1,6 @@
 class Strs{
   //version
-  static const int versionCode = 10;
+  static const int versionCode = 47;
 
   //url
   static const String baseUrl = 'https://neko.lacus.site';
@@ -47,6 +47,7 @@ class Strs{
   static const String keyUserId = 'open_id';
   static const String keyUserName = 'nick';
   static const String keyUserImg = 'avatar';
+  static const String keyUserIsAdmin = 'admin';
   static const String keyCommentID = 'comment_id';
   static const String keyCommentContent = 'content';
   static const String keyCommentPosition = 'position';

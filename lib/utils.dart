@@ -118,7 +118,7 @@ Future<void> getUserMsg(BuildContext context) async {
 
 void autoUpdateUserMsg(BuildContext context){
   getUserMsg(context);
-  Timer.periodic(Duration(seconds: 27), (_) => getUserMsg(context));
+  Timer.periodic(Duration(seconds: 37), (_) => getUserMsg(context));
 }
 
 Future<void> clearUserMsg(BuildContext context) async {

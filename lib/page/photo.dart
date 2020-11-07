@@ -136,6 +136,7 @@ class _PhotoPageState extends State<PhotoPage> {
                   panelController.close();
                   Future.delayed(Duration(milliseconds: 577), () => FocusScope.of(context).requestFocus(focusNode));
                 },
+                onLongPress: () => tryDelComment(comment.commentId, true),
                 child: Text('回复'),
                 padding: EdgeInsets.all(1),
                 minWidth: 37,
@@ -267,7 +268,7 @@ class _PhotoPageState extends State<PhotoPage> {
     }
 
     if(!isInputNotRubbish([textEditingController], 20, 1)){
-      showWrongDialog(context, '输入字数不得小于1大于20');
+      showWrongDialog(context, '字数不得小于1大于20');
       return;
     }
 
@@ -319,6 +320,7 @@ class _PhotoPageState extends State<PhotoPage> {
   }
 
   void tryDelComment(String commentId, bool isComment) {
+    //TODO: 需在此处鉴权，如果是此操作是评论发布本人或管理员，才可使用本接口
     print(this.commentId);
   }
 }
