@@ -10,13 +10,16 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
+UserProvider userProvider = locator<UserProvider>();
+CatProvider catProvider = locator<CatProvider>();
+
 Future<void> init() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocDir.path);
   await setupLocator(appDocDir.path);
   await initCatData();
-  locator<UserProvider>().loadLocalData();
-  locator<CatProvider>().loadData();
+  userProvider.loadLocalData();
+  catProvider.loadData();
 }
 
 void main() async {
@@ -25,8 +28,8 @@ void main() async {
   runApp(
       MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => locator<UserProvider>()),
-          ChangeNotifierProvider(create: (_) => locator<CatProvider>()),
+          ChangeNotifierProvider(create: (_) => userProvider),
+          ChangeNotifierProvider(create: (_) => catProvider),
         ],
         child: MyApp(),
       )

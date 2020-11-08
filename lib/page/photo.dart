@@ -49,7 +49,7 @@ class _PhotoPageState extends State<PhotoPage> {
       body: SlidingUpPanel(
         controller: panelController,
         body: _buildBody(context),
-        collapsed: ElasticInDown(child: _buildContainer(context, _buildCollapsed(context))),
+        collapsed: ElasticInRight(child: _buildContainer(context, _buildCollapsed(context))),
         panel: _buildContainer(context, _buildPanel(context)),
         minHeight: 107,
         maxHeight: 337,

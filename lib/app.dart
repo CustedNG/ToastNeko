@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:cat_gallery/data/all_str.dart';
+import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/page/home.dart';
 import 'package:cat_gallery/page/setting.dart';
 import 'package:cat_gallery/model/navigation_item.dart';
+import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:page_transition/page_transition.dart';
@@ -14,9 +16,10 @@ import 'package:flutter/services.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    bool haveInit = locator<UserStore>().haveInit.fetch();
     if (Platform.isAndroid) {
       SystemUiOverlayStyle systemUiOverlayStyle =
-      SystemUiOverlayStyle(statusBarColor: Colors.transparent);
+          SystemUiOverlayStyle(statusBarColor: Colors.transparent);
       SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     }
 
@@ -30,25 +33,24 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         home: AnimatedSplashScreen(
-          splash: Card(
+          splash: haveInit ? Card(
               elevation: 10.0,
               shape: RoundShape().build(),
               clipBehavior: Clip.antiAlias,
               semanticContainer: false,
               child: AspectRatio(
                 aspectRatio: 25 / 11,
-                child: Image.asset(
-                    Strs.bannerToastNeko,
-                    fit: BoxFit.cover),
+                child: Image.asset(Strs.bannerToastNeko, fit: BoxFit.cover),
               )
-          ),
+          ) : Center(child: Text('正在初始化, 请稍后...')),
           nextScreen: MyHomePage(title: Strs.appName),
-          duration: 1677,
+          duration: haveInit ? 77 : 4777,
           splashIconSize: 137,
           backgroundColor: Color.fromRGBO(243, 233, 198, 1),
           curve: Curves.easeInOutCubic,
-          animationDuration: Duration(milliseconds: 977),
-          splashTransition: SplashTransition.rotationTransition,
+          animationDuration: Duration(milliseconds: 777),
+          splashTransition: haveInit ? SplashTransition.rotationTransition
+                                     : SplashTransition.fadeTransition,
           pageTransitionType: PageTransitionType.fade,
         )
     );
@@ -96,8 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
       padding: isSelected ? EdgeInsets.only(left: 16, right: 16) : null,
       decoration: isSelected
           ? BoxDecoration(
-          color: item.color,
-          borderRadius: BorderRadius.all(Radius.circular(50)))
+              color: item.color,
+              borderRadius: BorderRadius.all(Radius.circular(50)))
           : null,
       child: ListView(
         scrollDirection: Axis.horizontal,
@@ -107,16 +109,19 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               IconTheme(
                 data: IconThemeData(
-                    size: 24, color: isDarkMode(context) ? Colors.white : Colors.black),
+                    size: 24,
+                    color: isDarkMode(context) ? Colors.white : Colors.black),
                 child: item.icon,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: isSelected
                     ? DefaultTextStyle.merge(
-                    child: item.title,
-                    style: TextStyle(
-                        color: isDarkMode(context) ? Colors.white : Colors.black))
+                        child: item.title,
+                        style: TextStyle(
+                            color: isDarkMode(context)
+                                ? Colors.white
+                                : Colors.black))
                     : null,
               )
             ],
