@@ -27,7 +27,7 @@ class MyImage extends StatelessWidget{
       loadedCallback: () => print('Successfully loaded $imgUrl'),
       loadFailedCallback: () => print('Failed to load $imgUrl'),
       useDiskCache: true,
-      cacheRule: CacheRule(maxAge: Duration(days: 15)),
+      cacheRule: CacheRule(maxAge: Duration(days: 30)),
     );
   }
 

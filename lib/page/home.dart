@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage>
     final nekoList = catData['neko_list'];
     if(nekoList == null)return;
 
-    _index = nekoList.length - 1;
+    _index = 0;//nekoList.length - 1;
     _fixedExtentScrollController = FixedExtentScrollController(initialItem: _index);
 
 
@@ -125,12 +125,13 @@ class _HomePageState extends State<HomePage>
         curve: Curves.easeInOutCubic
     )..addListener(() { setState(() {});});
 
+    /*
     Future.delayed(
         Duration(milliseconds: 477), () =>
         _fixedExtentScrollController.animateToItem(0,
             duration: Duration(seconds: 1),
             curve: Curves.easeInOutCubic)
-    );
+    );*/
   }
 
   Widget _buildList(BuildContext context, int index, double height, double width){
@@ -175,7 +176,7 @@ class _HomePageState extends State<HomePage>
                           children: <Widget>[
                             Text(
                               (Strs.diedCats.contains(catName))
-                                  ? catName + '  🙏'
+                                  ? catName + '  👼'
                                   : catName
                               ,
                               textScaleFactor: 1.0,

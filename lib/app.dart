@@ -49,8 +49,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color.fromRGBO(243, 233, 198, 1),
           curve: Curves.easeInOutCubic,
           animationDuration: Duration(milliseconds: 777),
-          splashTransition: haveInit ? SplashTransition.rotationTransition
-                                     : SplashTransition.fadeTransition,
+          splashTransition: SplashTransition.scaleTransition,
           pageTransitionType: PageTransitionType.fade,
         )
     );

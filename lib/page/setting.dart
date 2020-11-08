@@ -77,7 +77,7 @@ class _SettingPageState extends State<SettingPage>
     return Scaffold(
         appBar: AppBar(
           leading: Container(),
-          title: Text(Strs.appName),
+          title: Text(loggedIn ? '欢迎，${_user.nick}' : Strs.appName),
           centerTitle: true,
         ),
         body: _buildUser());
