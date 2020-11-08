@@ -1,6 +1,6 @@
 class Strs{
   //version
-  static const int versionCode = 47;
+  static const int versionCode = 49;
 
   //url
   static const String baseUrl = 'https://neko.lacus.site';
