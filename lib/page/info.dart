@@ -1,3 +1,4 @@
+import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/model/cat.dart';
 import 'package:flutter/material.dart';
 
@@ -46,6 +47,13 @@ class InfoPage extends StatelessWidget{
             Text('描述', style: title),
             SizedBox(height: 3),
             Text(cat.description, style: content),
+            SizedBox(height: 20),
+            Text('状态', style: title),
+            SizedBox(height: 3),
+            Text(
+                Strs.diedCats.contains(cat.displayName) ? '去世' : '存活',
+                style: content
+            ),
           ],
         ),
       )

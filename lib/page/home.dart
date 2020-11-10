@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage>
           )
       );
     });
+    catList.sort((a, b) => b.img.length.compareTo(a.img.length));
     setState(() {
       isBusy = false;
     });
@@ -134,7 +135,7 @@ class _HomePageState extends State<HomePage>
     );*/
   }
 
-  Widget _buildList(BuildContext context, int index, double height, double width){
+  Widget _buildCardItem(BuildContext context, int index, double height, double width){
     _scale = 1 - _curvedAnimation.value;
     final catName = catList[index].displayName;
     return Padding(
@@ -223,7 +224,7 @@ class _HomePageState extends State<HomePage>
                   cat: catList[_index]
               )
           ).go(context),
-          onVerticalDragUpdate: (updateDetail) {
+          /*onVerticalDragUpdate: (updateDetail) {
             if(updateDetail.delta.dy < -10){
               if(_index == catList.length - 1){
                 _fixedExtentScrollController.animateTo(
@@ -234,7 +235,7 @@ class _HomePageState extends State<HomePage>
               }else{
                 _fixedExtentScrollController.animateToItem(
                     _index + 1,
-                    duration: Duration(milliseconds: 777),
+                    duration: Duration(milliseconds: 377),
                     curve: Curves.easeInOutCubic
                 );
               }
@@ -249,20 +250,21 @@ class _HomePageState extends State<HomePage>
               }else{
                 _fixedExtentScrollController.animateToItem(
                     _index - 1,
-                    duration: Duration(milliseconds: 777),
+                    duration: Duration(milliseconds: 377),
                     curve: Curves.easeInOutCubic
                 );
               }
             }
-          },
+          },*/
           child: ListWheelScrollView.useDelegate(
             itemExtent: (width - 2 * _padding) / width * height,
             diameterRatio: 6,
             onSelectedItemChanged: (index) => _index = index,
             controller: _fixedExtentScrollController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildBuilderDelegate(
-                builder: (context, index) => _buildList(context, index, height, width),
+                builder: (context, index) =>
+                    _buildCardItem(context, index, height, width),
                 childCount: catList.length
             ),
           ),
