@@ -4,11 +4,13 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/error.dart';
 import 'package:cat_gallery/page/intro.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/page/prize.dart';
 import 'package:cat_gallery/route.dart';
+import 'package:cat_gallery/store/cat_store.dart';
 import 'package:cat_gallery/utils.dart';
 import 'package:cat_gallery/widget/input_decoration.dart';
 import 'package:cat_gallery/widget/round_btn.dart';
@@ -96,33 +98,33 @@ class _SettingPageState extends State<SettingPage>
             BoxDecoration(color: Colors.blueGrey, borderRadius: panelBorder),
         child: Center(
             child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.keyboard_arrow_up, color: Colors.white),
-            Row(
-                mainAxisAlignment: loggedIn
-                    ? MainAxisAlignment.spaceEvenly
-                    : MainAxisAlignment.center,
-                children: [
-                  !loggedIn
-                      ? RoundBtn(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.keyboard_arrow_up, color: Colors.white), Row(
+                    mainAxisAlignment: loggedIn
+                        ? MainAxisAlignment.spaceEvenly
+                        : MainAxisAlignment.center,
+                    children: [
+                      !loggedIn
+                          ? RoundBtn(
                           '登录',
                           Colors.cyan,
-                          () => isPanelOpen
-                              ? null
-                              : AppRoute(LoginPage()).go(context))
-                      : RoundBtn('退出登录', Colors.redAccent,
-                          () => isPanelOpen ? null : logout()),
-                  loggedIn
-                      ? RoundBtn(
+                              () => isPanelOpen
+                                  ? null
+                                  : AppRoute(LoginPage()).go(context))
+                          : RoundBtn('退出登录', Colors.redAccent,
+                              () => isPanelOpen ? null : logout()),
+                      loggedIn
+                          ? RoundBtn(
                           '修改昵称', Colors.cyan, () => _buildNickDialog(context))
-                      : Container(),
-                ]),
-            SizedBox(height: 13),
-          ],
-        )),
+                          : Container(),
+                    ]),
+                SizedBox(height: 13),
+              ],
+            )
+        ),
       ),
       panel: Container(
           decoration: BoxDecoration(
@@ -144,8 +146,9 @@ class _SettingPageState extends State<SettingPage>
   }
 
   Widget _buildMsgList(BuildContext context) {
-    var msgList = json.decode(_user.msg)['msg_list'];
+    var msgList = json.decode(_user.msg)[Strs.keyMsgList];
     final listLength = msgList.length + 1;
+    final catStore = locator<CatStore>();
     return Column(
       children: [
         Padding(
@@ -173,7 +176,7 @@ class _SettingPageState extends State<SettingPage>
                                     Future.delayed(Duration(seconds: 1),
                                         () => _panelController.close());
                                   })
-                                : _buildCommentItem(msgList, index)) //
+                                : _buildCommentItem(msgList, index, catStore)) //
                         ));
               }),
         )
@@ -181,19 +184,15 @@ class _SettingPageState extends State<SettingPage>
     );
   }
 
-  Widget _buildCommentItem(dynamic msgList, int index) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(msgList[index]['neko_id'] + '回复了你: '),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          mainAxisSize: MainAxisSize.min,
-          children: [Text(msgList[index]['create_time'])],
-        )
-      ],
+  Widget _buildCommentItem(dynamic msgList, int index, CatStore catStore) {
+    final msg = msgList[index];
+    final catId = msg[Strs.keyCatId];
+    final imgId = msg[Strs.keyFileName];
+    return Text(
+        '${msgList[index]['create_time']}: '
+        '在${getCatNameById(catId, catStore)}的'
+        '第${getImgIndexById(catId, imgId, catStore) + 1}张照片'
+        '得到了回复',
     );
   }
 

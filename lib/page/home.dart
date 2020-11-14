@@ -39,12 +39,11 @@ class _HomePageState extends State<HomePage>
     isBusy = true;
 
     catData = json.decode(catStore.allCats.fetch());
-    final nekoList = catData['neko_list'];
+    final nekoList = catData[Strs.keyCatList];
     if(nekoList == null)return;
 
     _index = 0;//nekoList.length - 1;
     _fixedExtentScrollController = FixedExtentScrollController(initialItem: _index);
-
 
     nekoList.forEach((cat){
       //TODO: 等英博改完后端用新的的解析方式
@@ -69,7 +68,6 @@ class _HomePageState extends State<HomePage>
     setState(() {
       isBusy = false;
     });
-    checkVersion(context);
 
     Future.delayed(Duration(seconds: 2), (){
       UserStore userStore = locator<UserStore>();
@@ -112,6 +110,8 @@ class _HomePageState extends State<HomePage>
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       autoUpdateUserMsg(context);
+      checkVersion(context);
+      getPrizeInfo(context);
     });
     initData();
 

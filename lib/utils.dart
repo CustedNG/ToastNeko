@@ -5,11 +5,13 @@ import 'dart:io';
 import 'package:cat_gallery/core/request.dart';
 import 'package:cat_gallery/data/all_str.dart';
 import 'package:cat_gallery/data/user_provider.dart';
+import 'package:cat_gallery/locator.dart';
 import 'package:cat_gallery/model/comment.dart';
 import 'package:cat_gallery/model/reply.dart';
 import 'package:cat_gallery/page/login.dart';
 import 'package:cat_gallery/route.dart';
 import 'package:cat_gallery/store/cat_store.dart';
+import 'package:cat_gallery/store/user_store.dart';
 import 'package:cat_gallery/widget/round_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -131,6 +133,64 @@ Future<void> clearUserMsg(BuildContext context) async {
     },
     success: (data) => user.clearMsg()
   );
+}
+
+Future<void> getPrizeInfo(BuildContext context) async {
+  final user = locator<UserStore>();
+  final userName = user.nick.fetch();
+  if(user.loggedIn.fetch()){
+    await Request().go(
+        'get',
+        Strs.getPrizeInfoUrl,
+        success: (body){
+          String data = body.toString();
+          String date = data.substring(4, 14);
+          if(user.prizeDate.fetch() != date){
+            user.prizeDate.put(date);
+            if(data.contains(userName)){
+              showRoundDialog(
+                  context,
+                  '恭喜$userName',
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('本次中奖名单:'),
+                      Text(data),
+                      Text('是否进群了解领取方式？')
+                    ],
+                  ),
+                  [
+                    FlatButton(
+                        onPressed: () => launchURL(Strs.joinQQUrl),
+                        child: Text('好👌')
+                    ),
+                    FlatButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('不❌')
+                    )
+                  ]
+              );
+            }
+          }
+        }
+    );
+  } else print('没有登陆，未获取中奖信息');
+}
+
+String getCatNameById(String catId, CatStore catStore){
+  Map catMap = json.decode(catStore.allCats.fetch());
+  for(var eachCat in catMap[Strs.keyCatList]){
+    if(eachCat[Strs.keyCatId] == catId) return eachCat[Strs.keyCatName];
+  }
+  return '未知';
+}
+
+int getImgIndexById(String catId, String imgId, CatStore catStore){
+  Map map = json.decode(catStore.fetch(catId));
+  List<String> imgs = [];
+  map[Strs.keyCatImg].forEach((url) => imgs.add(url));
+  return imgs.indexOf(imgId);
 }
 
 void unawaited(Future<void> future) {}

@@ -1,6 +1,6 @@
 class Strs{
   //version
-  static const int versionCode = 51;
+  static const int versionCode = 52;
 
   //url
   static const String baseUrl = 'https://neko.lacus.site';
@@ -28,8 +28,11 @@ class Strs{
   static const String adminManageCat = baseAdminApiUrl + '/neko';
   static const String adminManageVersion = baseAdminApiUrl + '/version';
 
+  static const String getPrizeInfoUrl = 'https://cat.lolli.tech/prize';
+
   //json
   static const String keyComment = 'comment';
+  static const String keyCatList = 'neko_list';
   static const String keyCatInfo = 'neko_info';
   static const String keyCatId = 'neko_id';
   static const String keyCatName = 'name';
@@ -57,6 +60,7 @@ class Strs{
   static const String keyIsComment = 'is_comment';
   static const String keyCreateTime = 'create_time';
   static const String keyFileName = 'file_name';
+  static const String keyMsgList = 'msg_list';
 
   //app
   static const String appName = 'Toast Neko';

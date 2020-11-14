@@ -11,6 +11,7 @@ class UserStore with PresistentStore {
   StoreProperty<String> get lastCommentTime => property('lastCommentTime');
   StoreProperty<String> get lastFeedbackTime => property('lastFeedbackTime');
   StoreProperty<String> get msg => property('msg');
+  StoreProperty<String> get prizeDate => property('prizeDate');
   StoreProperty<bool> get savePassword =>
       property('savePassword', defaultValue: false);
   StoreProperty<bool> get haveInit => property('init', defaultValue: false);
